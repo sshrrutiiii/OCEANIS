@@ -2,6 +2,10 @@ import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { TextureLoader } from "three";
 import { useRef } from "react";
+import ports from "../data/ports";
+import PortMarker from "./PortMarker";
+import { latLngToVector3 } from "../utils/globe";
+import RouteLine from "./RouteLine";
 
 import earthImg from "../assets/earth.jpg";
 import SpaceStars from "./Stars";
@@ -28,7 +32,7 @@ function Globe() {
   );
 }
 
-export default function Earth() {
+export default function Earth({ sourcePort, destinationPort }) {
   return (
     <Canvas camera={{ position: [0, 0, 3], fov: 45 }}>
       <SpaceStars />
@@ -40,6 +44,13 @@ export default function Earth() {
       <directionalLight position={[-5, -5, -5]} intensity={0.5} />
 
       <Globe />
+      
+      {ports.map((port) => (
+        <PortMarker
+          key={port.id}
+          position={latLngToVector3(port.lat, port.lng)}
+        />
+      ))}
 
       <OrbitControls
         enableZoom={false}
