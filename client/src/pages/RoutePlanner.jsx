@@ -17,12 +17,15 @@ function RoutePlanner() {
 
         <div className="grid lg:grid-cols-2 gap-10">
 
-          {/* Left */}
+          {/* Left Side */}
           <RouteForm setRouteData={setRouteData} />
 
-          {/* Right */}
+          {/* Right Side */}
           <div className="bg-slate-900 rounded-3xl h-[650px] border border-cyan-500/20 overflow-hidden">
-            <Earth />
+            <Earth
+              sourcePort={routeData?.sourcePort}
+              destinationPort={routeData?.destinationPort}
+            />
           </div>
 
         </div>

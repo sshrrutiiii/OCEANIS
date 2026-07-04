@@ -91,6 +91,8 @@ function RouteForm({ setRouteData }) {
                     setRouteData({
                         source,
                         destination,
+                        sourcePort,
+                        destinationPort,
                         speed,
                         distance: `${distance} km`,
                         eta: `${eta} Hours`,
