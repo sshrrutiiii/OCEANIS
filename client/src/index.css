@@ -1,12 +1,94 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-body{
-    font-family: 'Inter', sans-serif;
-    background:#020617;
+
+/* ---------- Global ---------- */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-h1,h2,h3{
-    font-family:'Space Grotesk',sans-serif;
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:'Inter',sans-serif;
+  color:white;
+  overflow-x:hidden;
+
+  background:
+  radial-gradient(circle at top,#0f172a,#020617 55%,#000814);
+}
+
+/* ---------- Headings ---------- */
+
+h1,h2,h3,h4{
+  font-family:'Space Grotesk',sans-serif;
+}
+
+/* ---------- Scrollbar ---------- */
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-track{
+  background:#020617;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#06b6d4;
+  border-radius:50px;
+}
+
+/* ---------- Glass Card ---------- */
+
+.glass{
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:
+  0 8px 30px rgba(0,0,0,.35);
+}
+
+/* ---------- Cyan Glow ---------- */
+
+.glow{
+  box-shadow:
+  0 0 15px rgba(34,211,238,.35),
+  0 0 40px rgba(34,211,238,.15);
+}
+
+/* ---------- Buttons ---------- */
+
+.btn-primary{
+  @apply px-6 py-3 rounded-xl bg-cyan-500 text-slate-900 font-semibold transition-all duration-300;
+}
+
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:
+  0 0 20px rgba(34,211,238,.5);
+}
+
+/* ---------- Inputs ---------- */
+
+input{
+  outline:none;
+}
+
+input:focus{
+  box-shadow:0 0 15px rgba(34,211,238,.45);
+}
+
+/* ---------- Selection ---------- */
+
+::selection{
+  background:#06b6d4;
+  color:white;
 }

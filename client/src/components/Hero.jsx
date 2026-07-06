@@ -1,90 +1,94 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import Badge from "./ui/Badge";
-import Earth from "../three/Earth";
+import earth from "../assets/earth.jpg";
 
 function Hero() {
   return (
-    <section className="min-h-screen bg-slate-950 text-white flex items-center justify-between px-12 pt-24">
+    <section className="relative min-h-screen overflow-hidden bg-[#020617]">
 
-      {/* Left Side */}
-      <div className="w-1/2">
+      {/* Background Glow */}
+      <div className="absolute top-[-180px] left-[-150px] w-[450px] h-[450px] bg-cyan-500/20 blur-[170px] rounded-full"></div>
 
-        <motion.p
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-cyan-400 uppercase tracking-[0.3em] mb-4"
-        >
-          Global Maritime Intelligence
-        </motion.p>
+      <div className="absolute bottom-[-150px] right-[-120px] w-[400px] h-[400px] bg-blue-700/20 blur-[170px] rounded-full"></div>
 
-        <motion.h1
-          initial={{ opacity: 0, x: -80 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1 }}
-          className="text-7xl font-bold leading-tight"
-        >
-          Every Voyage
-          <br />
-          Begins with the
-          <br />
-          <span className="text-cyan-400">
-            Right Route.
-          </span>
-        </motion.h1>
+      {/* Grid Background */}
+      <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:60px_60px]" />
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
-          className="mt-8 text-slate-400 text-lg leading-8 max-w-xl"
-        >
-          Discover the shortest maritime routes using graph algorithms,
-          visualize global shipping networks, and simulate ship movement
-          in real time.
-        </motion.p>
+      <div className="max-w-7xl mx-auto px-8 pt-28 min-h-screen flex items-center">
 
-        {/* Badges */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="flex flex-wrap gap-4 mt-8"
-        >
-          <Badge icon="🌍" text="200+ Global Ports" />
-          <Badge icon="🚢" text="Ship Simulation" />
-          <Badge icon="⚡" text="Dijkstra Algorithm" />
-          <Badge icon="☕" text="Java Spring Boot" />
-        </motion.div>
+        <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
 
-        {/* Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-          className="mt-10 flex gap-5"
-        >
-          <button className="bg-cyan-500 px-7 py-4 rounded-xl text-slate-900 font-semibold hover:bg-cyan-400 hover:scale-105 transition duration-300">
-            Launch Mission
-          </button>
+          {/* Left Side */}
+          <motion.div
+            initial={{ opacity: 0, x: -80 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1 }}
+          >
 
-          <button className="border border-cyan-500 px-7 py-4 rounded-xl hover:bg-cyan-500/10 hover:scale-105 transition duration-300">
-            Explore Network
-          </button>
-        </motion.div>
+            <span className="inline-block px-4 py-2 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 mb-8">
+              AI Powered Maritime Intelligence
+            </span>
+
+            <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
+              Smarter
+              <span className="text-cyan-400"> Ocean </span>
+              Navigation
+            </h1>
+
+            <p className="text-slate-400 text-lg mt-8 leading-8 max-w-xl">
+              Plan optimized maritime routes, monitor ships in real time,
+              visualize maritime analytics and simulate intelligent navigation
+              using a modern AI-powered dashboard.
+            </p>
+
+            <div className="flex flex-wrap gap-5 mt-10">
+
+              <Link
+                to="/route-planner"
+                className="px-7 py-4 rounded-xl bg-cyan-500 text-slate-900 font-bold hover:bg-cyan-400 transition duration-300"
+              >
+                Start Planning
+              </Link>
+
+              <Link
+                to="/dashboard"
+                className="px-7 py-4 rounded-xl border border-cyan-500 text-cyan-300 hover:bg-cyan-500/10 transition duration-300"
+              >
+                View Dashboard
+              </Link>
+
+            </div>
+
+          </motion.div>
+
+          {/* Right Side */}
+          <motion.div
+            initial={{ opacity: 0, x: 80 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1 }}
+            className="flex justify-center"
+          >
+
+            <div className="relative">
+
+              <div className="absolute inset-0 bg-cyan-500 blur-[120px] opacity-30 rounded-full"></div>
+
+              <img
+                src={earth}
+                alt="Earth"
+                className="relative w-[520px] rounded-full animate-spin"
+                style={{
+                  animationDuration: "80s",
+                }}
+              />
+
+            </div>
+
+          </motion.div>
+
+        </div>
 
       </div>
-
-      {/* Right Side */}
-     {/* Right Side */}
-<motion.div
-  initial={{ opacity: 0, scale: 0.8 }}
-  animate={{ opacity: 1, scale: 1 }}
-  transition={{ duration: 1.2 }}
-  className="w-1/2 h-[650px]"
->
-  <Earth />
-</motion.div>
 
     </section>
   );
