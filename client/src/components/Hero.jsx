@@ -76,10 +76,8 @@ function Hero() {
               <img
                 src={earth}
                 alt="Earth"
-                className="relative w-[520px] rounded-full animate-spin"
-                style={{
-                  animationDuration: "80s",
-                }}
+                className="w-[550px] h-[550px] object-cover rounded-full border-4 border-cyan-400/30 shadow-[0_0_80px_rgba(34,211,238,0.5)] animate-spin"
+                style={{ animationDuration: "80s" }}
               />
 
             </div>

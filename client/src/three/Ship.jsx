@@ -1,36 +1,50 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 
-function Ship({ start, end, playing, speed }) {
+function Ship({ start, end }) {
   const shipRef = useRef();
   const progress = useRef(0);
 
   useFrame(() => {
-    if (!shipRef.current || !start || !end || !playing) return;
+    if (!shipRef.current || !start || !end) return;
 
-    progress.current += 0.001 * speed;
+    progress.current += 0.002;
 
     if (progress.current > 1) {
-      progress.current = 1;
+      progress.current = 0;
     }
 
-    shipRef.current.position.lerpVectors(
-      { x: start[0], y: start[1], z: start[2] },
-      { x: end[0], y: end[1], z: end[2] },
-      progress.current
-    );
+    const x = start[0] + (end[0] - start[0]) * progress.current;
+    const y = start[1] + (end[1] - start[1]) * progress.current;
+    const z = start[2] + (end[2] - start[2]) * progress.current;
+
+    shipRef.current.position.set(x, y, z);
   });
 
   if (!start || !end) return null;
 
   return (
-    <mesh
-      ref={shipRef}
-      position={start}
-    >
-      <coneGeometry args={[0.03, 0.08, 12]} />
-      <meshStandardMaterial color="#22d3ee" />
-    </mesh>
+    <group ref={shipRef} position={start}>
+      {/* Ship Body */}
+      <mesh>
+        <coneGeometry args={[0.025, 0.09, 20]} />
+        <meshStandardMaterial
+          color="#06b6d4"
+          emissive="#06b6d4"
+          emissiveIntensity={2}
+        />
+      </mesh>
+
+      {/* Glow */}
+      <mesh>
+        <sphereGeometry args={[0.015, 20, 20]} />
+        <meshStandardMaterial
+          color="#67e8f9"
+          emissive="#67e8f9"
+          emissiveIntensity={5}
+        />
+      </mesh>
+    </group>
   );
 }
 

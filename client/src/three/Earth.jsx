@@ -1,16 +1,16 @@
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { TextureLoader } from "three";
+import { TextureLoader, BackSide } from "three";
 import { useRef, useMemo } from "react";
 
-import ports from "../data/ports";
 import PortMarker from "./PortMarker";
 import RouteLine from "./RouteLine";
 import Ship from "./Ship";
+import SpaceStars from "./Stars";
+
 import { latLngToVector3 } from "../utils/globe";
 
-import earthImg from "../assets/earth.jpg";
-import SpaceStars from "./Stars";
+import earthImg from "../assets/earth_2k.jpg";
 
 function Globe() {
   const texture = useLoader(TextureLoader, earthImg);
@@ -18,24 +18,39 @@ function Globe() {
 
   useFrame(() => {
     if (globeRef.current) {
-      globeRef.current.rotation.y += 0.002;
+      globeRef.current.rotation.y += 0.0008;
     }
   });
 
   return (
-    <mesh ref={globeRef}>
-      <sphereGeometry args={[1, 128, 128]} />
-      <meshStandardMaterial
-        map={texture}
-        metalness={0.2}
-        roughness={0.8}
-      />
-    </mesh>
+    <>
+      {/* Earth */}
+      <mesh ref={globeRef}>
+        <sphereGeometry args={[1, 256, 256]} />
+        <meshStandardMaterial
+          map={texture}
+          metalness={0}
+          roughness={0.85}
+          emissive="#02111f"
+          emissiveIntensity={0.08}
+        />
+      </mesh>
+
+      {/* Atmosphere Glow */}
+      <mesh scale={1.03}>
+        <sphereGeometry args={[1, 128, 128]} />
+        <meshBasicMaterial
+          color="#38bdf8"
+          transparent
+          opacity={0.08}
+          side={BackSide}
+        />
+      </mesh>
+    </>
   );
 }
 
 export default function Earth({ sourcePort, destinationPort }) {
-
   const start = useMemo(() => {
     if (!sourcePort) return null;
     return latLngToVector3(sourcePort.lat, sourcePort.lng);
@@ -46,46 +61,63 @@ export default function Earth({ sourcePort, destinationPort }) {
     return latLngToVector3(destinationPort.lat, destinationPort.lng);
   }, [destinationPort]);
 
-  const shipPosition = useMemo(() => {
-    if (!start || !end) return null;
-
-    return [
-      (start[0] + end[0]) / 2,
-      (start[1] + end[1]) / 2,
-      (start[2] + end[2]) / 2,
-    ];
-  }, [start, end]);
-
   return (
-    <Canvas camera={{ position: [0, 0, 3], fov: 45 }}>
+    <Canvas
+      camera={{
+        position: [0, 0, 2.6],
+        fov: 40,
+      }}
+    >
+      {/* Background Stars */}
       <SpaceStars />
 
-      <ambientLight intensity={1} />
-      <directionalLight position={[5, 5, 5]} intensity={2} />
-      <directionalLight position={[-5, -5, -5]} intensity={0.5} />
+      {/* Lights */}
+      <ambientLight intensity={0.55} />
 
+      <directionalLight
+        position={[5, 3, 5]}
+        intensity={3}
+      />
+
+      <directionalLight
+        position={[-4, -2, -3]}
+        intensity={0.8}
+      />
+
+      <pointLight
+        position={[0, 0, 4]}
+        intensity={0.8}
+      />
+
+      {/* Globe */}
       <Globe />
 
+      {/* Source Marker */}
+      {start && <PortMarker position={start} />}
+
+      {/* Destination Marker */}
+      {end && <PortMarker position={end} />}
+
+      {/* Route */}
       {start && end && (
-        <RouteLine start={start} end={end} />
+        <RouteLine
+          start={start}
+          end={end}
+        />
       )}
 
+      {/* Ship */}
       {start && end && (
         <Ship
           start={start}
           end={end}
         />
       )}
-      {ports.map((port) => (
-        <PortMarker
-          key={port.id}
-          position={latLngToVector3(port.lat, port.lng)}
-        />
-      ))}
 
       <OrbitControls
         enableZoom={false}
         enablePan={false}
+        autoRotate={false}
       />
     </Canvas>
   );
