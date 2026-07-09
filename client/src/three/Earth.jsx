@@ -14,18 +14,11 @@ import earthImg from "../assets/earth_2k.jpg";
 
 function Globe() {
   const texture = useLoader(TextureLoader, earthImg);
-  const globeRef = useRef();
-
-  useFrame(() => {
-    if (globeRef.current) {
-      globeRef.current.rotation.y += 0.0008;
-    }
-  });
 
   return (
     <>
       {/* Earth */}
-      <mesh ref={globeRef}>
+      <mesh>
         <sphereGeometry args={[1, 256, 256]} />
         <meshStandardMaterial
           map={texture}
@@ -36,7 +29,7 @@ function Globe() {
         />
       </mesh>
 
-      {/* Atmosphere Glow */}
+      {/* Atmosphere */}
       <mesh scale={1.03}>
         <sphereGeometry args={[1, 128, 128]} />
         <meshBasicMaterial
@@ -47,6 +40,39 @@ function Globe() {
         />
       </mesh>
     </>
+  );
+}
+
+function RotatingGlobe({ start, end }) {
+  const groupRef = useRef();
+
+  useFrame(() => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y += 0.0008;
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      <Globe />
+
+      {start && <PortMarker position={start} />}
+      {end && <PortMarker position={end} />}
+
+      {start && end && (
+        <RouteLine
+          start={start}
+          end={end}
+        />
+      )}
+
+      {start && end && (
+        <Ship
+          start={start}
+          end={end}
+        />
+      )}
+    </group>
   );
 }
 
@@ -64,14 +90,12 @@ export default function Earth({ sourcePort, destinationPort }) {
   return (
     <Canvas
       camera={{
-        position: [0, 0, 2.6],
-        fov: 40,
+        position: [0, 0, 3.2],
+        fov: 45,
       }}
     >
-      {/* Background Stars */}
       <SpaceStars />
 
-      {/* Lights */}
       <ambientLight intensity={0.55} />
 
       <directionalLight
@@ -89,35 +113,16 @@ export default function Earth({ sourcePort, destinationPort }) {
         intensity={0.8}
       />
 
-      {/* Globe */}
-      <Globe />
-
-      {/* Source Marker */}
-      {start && <PortMarker position={start} />}
-
-      {/* Destination Marker */}
-      {end && <PortMarker position={end} />}
-
-      {/* Route */}
-      {start && end && (
-        <RouteLine
-          start={start}
-          end={end}
-        />
-      )}
-
-      {/* Ship */}
-      {start && end && (
-        <Ship
-          start={start}
-          end={end}
-        />
-      )}
+      <RotatingGlobe
+        start={start}
+        end={end}
+      />
 
       <OrbitControls
         enableZoom={false}
         enablePan={false}
-        autoRotate={false}
+        minPolarAngle={Math.PI / 2}
+        maxPolarAngle={Math.PI / 2}
       />
     </Canvas>
   );

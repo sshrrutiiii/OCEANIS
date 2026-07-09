@@ -1,17 +1,21 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 
-function Ship({ start, end }) {
+function Ship({ start, end, playing, speed }) {
   const shipRef = useRef();
   const progress = useRef(0);
 
   useFrame(() => {
     if (!shipRef.current || !start || !end) return;
 
-    progress.current += 0.002;
+    // Pause
+    if (!playing) return;
 
-    if (progress.current > 1) {
-      progress.current = 0;
+    // Ship movement
+    progress.current += 0.0015 * speed;
+
+    if (progress.current >= 1) {
+      progress.current = 1;
     }
 
     const x = start[0] + (end[0] - start[0]) * progress.current;
@@ -26,7 +30,7 @@ function Ship({ start, end }) {
   return (
     <group ref={shipRef} position={start}>
       {/* Ship Body */}
-      <mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
         <coneGeometry args={[0.025, 0.09, 20]} />
         <meshStandardMaterial
           color="#06b6d4"

@@ -1,0 +1,95 @@
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { useMemo } from "react";
+
+import Globe from "./Globe";
+import Ship from "./Ship";
+import RouteLine from "./RouteLine";
+import PortMarker from "./PortMarker";
+import SpaceStars from "./Stars";
+
+import { latLngToVector3 } from "../utils/globe";
+
+function EarthSimulation({
+  sourcePort,
+  destinationPort,
+  playing,
+  speed,
+}) {
+  const start = useMemo(() => {
+    if (!sourcePort) return null;
+    return latLngToVector3(sourcePort.lat, sourcePort.lng);
+  }, [sourcePort]);
+
+  const end = useMemo(() => {
+    if (!destinationPort) return null;
+    return latLngToVector3(destinationPort.lat, destinationPort.lng);
+  }, [destinationPort]);
+
+  return (
+    <Canvas
+      camera={{
+        position: [0, 0, 3.2],
+        fov: 45,
+      }}
+    >
+      <SpaceStars />
+
+      <ambientLight intensity={0.6} />
+
+      <directionalLight
+        position={[5, 3, 5]}
+        intensity={3}
+      />
+
+      <directionalLight
+        position={[-4, -2, -3]}
+        intensity={0.8}
+      />
+
+      <pointLight
+        position={[0, 0, 4]}
+        intensity={0.8}
+      />
+
+      <Globe />
+
+      {start && (
+        <PortMarker
+          position={start}
+          color="#22d3ee"
+        />
+      )}
+
+      {end && (
+        <PortMarker
+          position={end}
+          color="#ef4444"
+        />
+      )}
+
+      {start && end && (
+        <RouteLine
+          start={start}
+          end={end}
+        />
+      )}
+
+      {start && end && (
+        <Ship
+          start={start}
+          end={end}
+          playing={playing}
+          speed={speed}
+        />
+      )}
+
+      <OrbitControls
+        enableZoom={false}
+        enablePan={false}
+      />
+    </Canvas>
+  );
+}
+
+export default EarthSimulation;

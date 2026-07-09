@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaAnchor,
   FaMapMarkerAlt,
@@ -11,6 +12,8 @@ import { calculateDistance } from "../utils/distance";
 import { generateRoute } from "../utils/routes";
 
 function RouteForm({ setRouteData }) {
+  const navigate = useNavigate();
+
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
   const [speed, setSpeed] = useState(20);
@@ -18,6 +21,11 @@ function RouteForm({ setRouteData }) {
   const handleCalculate = () => {
     if (!source || !destination) {
       alert("Please select both ports.");
+      return;
+    }
+
+    if (source === destination) {
+      alert("Source and Destination cannot be the same.");
       return;
     }
 
@@ -32,7 +40,7 @@ function RouteForm({ setRouteData }) {
 
     const fuel = (distance * 0.08).toFixed(0);
 
-    setRouteData({
+    const route = {
       source,
       destination,
       sourcePort,
@@ -42,12 +50,20 @@ function RouteForm({ setRouteData }) {
       eta: `${eta} Hours`,
       fuel: `${fuel} Tons`,
       route: generateRoute(source, destination),
-    });
+    };
+
+    setRouteData(route);
+
+    localStorage.setItem(
+      "routeData",
+      JSON.stringify(route)
+    );
+
+    navigate("/simulation");
   };
 
   return (
     <div>
-
       <p className="text-cyan-400 uppercase tracking-[0.25em] text-sm mb-2">
         Intelligent Navigation
       </p>
@@ -57,8 +73,8 @@ function RouteForm({ setRouteData }) {
       </h2>
 
       {/* Source */}
-      <div className="mb-6">
 
+      <div className="mb-6">
         <label className="flex items-center gap-2 text-slate-300 mb-2">
           <FaAnchor className="text-cyan-400" />
           Source Port
@@ -67,7 +83,7 @@ function RouteForm({ setRouteData }) {
         <select
           value={source}
           onChange={(e) => setSource(e.target.value)}
-          className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:border-cyan-400 outline-none transition"
+          className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:border-cyan-400 outline-none"
         >
           <option value="">Select Source Port</option>
 
@@ -77,13 +93,11 @@ function RouteForm({ setRouteData }) {
             </option>
           ))}
         </select>
-
       </div>
 
       {/* Destination */}
 
       <div className="mb-6">
-
         <label className="flex items-center gap-2 text-slate-300 mb-2">
           <FaMapMarkerAlt className="text-cyan-400" />
           Destination Port
@@ -92,7 +106,7 @@ function RouteForm({ setRouteData }) {
         <select
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
-          className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:border-cyan-400 outline-none transition"
+          className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:border-cyan-400 outline-none"
         >
           <option value="">Select Destination Port</option>
 
@@ -102,15 +116,12 @@ function RouteForm({ setRouteData }) {
             </option>
           ))}
         </select>
-
       </div>
 
       {/* Speed */}
 
       <div className="mb-8">
-
         <label className="flex justify-between mb-3 text-slate-300">
-
           <span className="flex items-center gap-2">
             <FaShip className="text-cyan-400" />
             Ship Speed
@@ -119,7 +130,6 @@ function RouteForm({ setRouteData }) {
           <span className="text-cyan-400 font-bold">
             {speed} knots
           </span>
-
         </label>
 
         <input
@@ -127,22 +137,20 @@ function RouteForm({ setRouteData }) {
           min="10"
           max="40"
           value={speed}
-          onChange={(e) => setSpeed(e.target.value)}
+          onChange={(e) => setSpeed(Number(e.target.value))}
           className="w-full accent-cyan-400 cursor-pointer"
         />
-
       </div>
 
       {/* Button */}
 
       <button
         onClick={handleCalculate}
-        className="w-full flex justify-center items-center gap-3 bg-cyan-500 hover:bg-cyan-400 rounded-xl py-4 text-slate-900 font-bold text-lg transition duration-300 hover:scale-105"
+        className="w-full flex items-center justify-center gap-3 bg-cyan-500 hover:bg-cyan-400 rounded-xl py-4 text-slate-900 font-bold text-lg transition hover:scale-105"
       >
         <FaRoute />
         Calculate Route
       </button>
-
     </div>
   );
 }
