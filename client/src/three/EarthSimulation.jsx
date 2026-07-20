@@ -1,95 +1,164 @@
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import EarthSimulation from "../three/EarthSimulation";
+import SimulationControls from "../components/SimulationControls";
 
-import Globe from "./Globe";
-import Ship from "./Ship";
-import RouteLine from "./RouteLine";
-import PortMarker from "./PortMarker";
-import SpaceStars from "./Stars";
+function Simulation() {
+  const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const [progress, setProgress] = useState(0);
 
-import { latLngToVector3 } from "../utils/globe";
+  const resetSimulation = () => {
+    setPlaying(false);
+    setSpeed(1);
+    setProgress(0);
+  };
 
-function EarthSimulation({
-  sourcePort,
-  destinationPort,
-  playing,
-  speed,
-}) {
-  const start = useMemo(() => {
-    if (!sourcePort) return null;
-    return latLngToVector3(sourcePort.lat, sourcePort.lng);
-  }, [sourcePort]);
+  const routeData = useMemo(() => {
+    return JSON.parse(localStorage.getItem("routeData"));
+  }, []);
 
-  const end = useMemo(() => {
-    if (!destinationPort) return null;
-    return latLngToVector3(destinationPort.lat, destinationPort.lng);
-  }, [destinationPort]);
+  if (!routeData) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white text-2xl">
+        No Route Selected
+      </div>
+    );
+  }
 
   return (
-    <Canvas
-      camera={{
-        position: [0, 0, 3.2],
-        fov: 45,
-      }}
-    >
-      <SpaceStars />
+    <div className="min-h-screen bg-slate-950 text-white pt-28 px-8">
+      <div className="max-w-7xl mx-auto">
 
-      <ambientLight intensity={0.6} />
+        <h1 className="text-5xl font-bold text-center mb-12">
+          Live Ship Simulation
+        </h1>
 
-      <directionalLight
-        position={[5, 3, 5]}
-        intensity={3}
-      />
+        <div className="grid lg:grid-cols-2 gap-8">
 
-      <directionalLight
-        position={[-4, -2, -3]}
-        intensity={0.8}
-      />
+          {/* Left Panel */}
 
-      <pointLight
-        position={[0, 0, 4]}
-        intensity={0.8}
-      />
+          <div className="bg-slate-900 rounded-3xl p-8 border border-cyan-500/20">
 
-      <Globe />
+            <h2 className="text-3xl font-bold text-cyan-400 mb-8">
+              Voyage Details
+            </h2>
 
-      {start && (
-        <PortMarker
-          position={start}
-          color="#22d3ee"
-        />
-      )}
+            <div className="space-y-6 text-lg">
 
-      {end && (
-        <PortMarker
-          position={end}
-          color="#ef4444"
-        />
-      )}
+              <div className="flex justify-between">
+                <span>Source Port</span>
+                <span className="text-cyan-400">
+                  {routeData.source}
+                </span>
+              </div>
 
-      {start && end && (
-        <RouteLine
-          start={start}
-          end={end}
-        />
-      )}
+              <div className="flex justify-between">
+                <span>Destination</span>
+                <span className="text-cyan-400">
+                  {routeData.destination}
+                </span>
+              </div>
 
-      {start && end && (
-        <Ship
-          start={start}
-          end={end}
-          playing={playing}
-          speed={speed}
-        />
-      )}
+              <div className="flex justify-between">
+                <span>Distance</span>
+                <span>{routeData.distance}</span>
+              </div>
 
-      <OrbitControls
-        enableZoom={false}
-        enablePan={false}
-      />
-    </Canvas>
+              <div className="flex justify-between">
+                <span>Estimated Time</span>
+                <span>{routeData.eta}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Fuel Required</span>
+                <span>{routeData.fuel}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Ship Speed</span>
+                <span>{routeData.speed} knots</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Status</span>
+
+                <span
+                  className={`font-semibold ${
+                    progress >= 1
+                      ? "text-green-400"
+                      : playing
+                      ? "text-cyan-400"
+                      : "text-yellow-400"
+                  }`}
+                >
+                  {progress >= 1
+                    ? "Voyage Completed"
+                    : playing
+                    ? "Sailing"
+                    : "Paused"}
+                </span>
+              </div>
+
+            </div>
+
+            {/* Progress */}
+
+            <div className="mt-8">
+
+              <div className="flex justify-between mb-2">
+                <span>Voyage Progress</span>
+
+                <span className="text-cyan-400">
+                  {(progress * 100).toFixed(0)}%
+                </span>
+              </div>
+
+              <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+
+                <div
+                  className="h-full bg-cyan-400 transition-all duration-300"
+                  style={{
+                    width: `${progress * 100}%`,
+                  }}
+                />
+
+              </div>
+
+            </div>
+
+            {/* Controls */}
+
+            <div className="mt-10">
+              <SimulationControls
+                playing={playing}
+                setPlaying={setPlaying}
+                speed={speed}
+                setSpeed={setSpeed}
+                resetSimulation={resetSimulation}
+              />
+            </div>
+
+          </div>
+
+          {/* Earth */}
+
+          <div className="bg-slate-900 rounded-3xl border border-cyan-500/20 overflow-hidden h-[650px]">
+
+            <EarthSimulation
+              sourcePort={routeData.sourcePort}
+              destinationPort={routeData.destinationPort}
+              playing={playing}
+              speed={speed}
+              onProgress={setProgress}
+            />
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
   );
 }
 
-export default EarthSimulation;
+export default Simulation;

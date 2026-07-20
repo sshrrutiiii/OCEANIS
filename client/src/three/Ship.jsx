@@ -1,21 +1,29 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 
-function Ship({ start, end, playing, speed }) {
+function Ship({
+  start,
+  end,
+  playing,
+  speed,
+  onProgress,
+}) {
   const shipRef = useRef();
   const progress = useRef(0);
 
   useFrame(() => {
     if (!shipRef.current || !start || !end) return;
-
-    // Pause
     if (!playing) return;
 
-    // Ship movement
     progress.current += 0.0015 * speed;
 
     if (progress.current >= 1) {
       progress.current = 1;
+    }
+
+    // Parent ko progress bhejo
+    if (onProgress) {
+      onProgress(progress.current);
     }
 
     const x = start[0] + (end[0] - start[0]) * progress.current;
