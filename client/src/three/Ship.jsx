@@ -1,5 +1,6 @@
 import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
+import { generateRoutePoints } from "../utils/routeCurve";
 
 function Ship({
   start,
@@ -13,20 +14,21 @@ function Ship({
   const progress = useRef(0);
   const lastSent = useRef(0);
 
+  const routePoints = useMemo(() => {
+    return generateRoutePoints(start, end, 120);
+  }, [start, end]);
+
   useFrame(() => {
-    if (!shipRef.current || !start || !end) return;
-
-    // Pause
+    if (!shipRef.current) return;
     if (!playing) return;
+    if (routePoints.length === 0) return;
 
-    // Move ship
     progress.current += 0.0015 * speed;
 
-    if (progress.current >= 1) {
+    if (progress.current > 1) {
       progress.current = 1;
     }
 
-    // Update parent only when progress changes by 1%
     if (
       onProgress &&
       Math.abs(progress.current - lastSent.current) >= 0.01
@@ -35,31 +37,34 @@ function Ship({
       onProgress(progress.current);
     }
 
-    // Ship Position
-    const x = start[0] + (end[0] - start[0]) * progress.current;
-    const y = start[1] + (end[1] - start[1]) * progress.current;
-    const z = start[2] + (end[2] - start[2]) * progress.current;
+    const index = Math.min(
+      Math.floor(progress.current * (routePoints.length - 1)),
+      routePoints.length - 2
+    );
 
-    shipRef.current.position.set(x, y, z);
+    const current = routePoints[index];
+    const next = routePoints[index + 1];
 
-    const dx = end[0] - start[0];
-const dy = end[1] - start[1];
-const dz = end[2] - start[2];
+    shipRef.current.position.set(
+      current[0],
+      current[1],
+      current[2]
+    );
 
-shipRef.current.lookAt(
-  x + dx,
-  y + dy,
-  z + dz
-);
+    shipRef.current.lookAt(
+      next[0],
+      next[1],
+      next[2]
+    );
 
-shipRef.current.rotateX(Math.PI / 2);
+    shipRef.current.rotateX(Math.PI / 2);
   });
 
   if (!start || !end) return null;
 
   return (
-    <group ref={shipRef} position={start}>
-      {/* Ship */}
+    <group ref={shipRef}>
+      {/* Ship Body */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <coneGeometry args={[0.025, 0.09, 20]} />
         <meshStandardMaterial
