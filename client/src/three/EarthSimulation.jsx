@@ -53,38 +53,40 @@ function EarthSimulation({
         intensity={0.8}
       />
 
-      <Globe />
+      <Globe>
 
-      {start && (
-        <PortMarker
-          position={start}
-          color="#22d3ee"
-        />
-      )}
+        {start && (
+          <PortMarker
+            position={start}
+            color="#22d3ee"
+          />
+        )}
 
-      {end && (
-        <PortMarker
-          position={end}
-          color="#ef4444"
-        />
-      )}
+        {end && (
+          <PortMarker
+            position={end}
+            color="#ef4444"
+          />
+        )}
 
-      {start && end && (
-        <RouteLine
-          start={start}
-          end={end}
-        />
-      )}
+        {start && end && (
+          <RouteLine
+            start={start}
+            end={end}
+          />
+        )}
 
-      {start && end && (
-        <Ship
-          start={start}
-          end={end}
-          playing={playing}
-          speed={speed}
-          onProgress={onProgress}
-        />
-      )}
+        {start && end && (
+          <Ship
+            start={start}
+            end={end}
+            playing={playing}
+            speed={speed}
+            onProgress={onProgress}
+          />
+        )}
+
+      </Globe>
 
       <OrbitControls
         enableZoom={false}

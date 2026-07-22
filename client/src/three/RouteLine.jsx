@@ -4,29 +4,36 @@ function RouteLine({ start, end }) {
   if (!start || !end) return null;
 
   const points = [];
+  const segments = 120;
 
-  for (let i = 0; i <= 50; i++) {
-    const t = i / 50;
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
 
+    // Linear interpolation
     const x = start[0] + (end[0] - start[0]) * t;
     const y = start[1] + (end[1] - start[1]) * t;
     const z = start[2] + (end[2] - start[2]) * t;
 
-    // Lift route above the Earth
-    const scale = 1 + 0.18 * Math.sin(Math.PI * t);
+    // Smooth arc
+    const arcHeight = 0.25 * Math.sin(Math.PI * t);
+
+    // Normalize direction
+    const length = Math.sqrt(x * x + y * y + z * z);
 
     points.push([
-      x * scale,
-      y * scale,
-      z * scale,
+      (x / length) * (1 + arcHeight),
+      (y / length) * (1 + arcHeight),
+      (z / length) * (1 + arcHeight),
     ]);
   }
 
   return (
     <Line
       points={points}
-      color="#22d3ee"
-      lineWidth={2.5}
+      color="#38bdf8"
+      lineWidth={3}
+      transparent
+      opacity={0.9}
     />
   );
 }

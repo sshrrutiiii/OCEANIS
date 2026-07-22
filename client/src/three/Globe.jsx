@@ -3,11 +3,12 @@ import { TextureLoader, BackSide } from "three";
 
 import earthImg from "../assets/earth_2k.jpg";
 
-function Globe() {
+function Globe({ globeRef, children }) {
   const texture = useLoader(TextureLoader, earthImg);
 
   return (
-    <>
+    <group ref={globeRef}>
+      {/* Earth */}
       <mesh>
         <sphereGeometry args={[1, 256, 256]} />
         <meshStandardMaterial
@@ -19,6 +20,7 @@ function Globe() {
         />
       </mesh>
 
+      {/* Atmosphere */}
       <mesh scale={1.03}>
         <sphereGeometry args={[1, 128, 128]} />
         <meshBasicMaterial
@@ -28,7 +30,10 @@ function Globe() {
           side={BackSide}
         />
       </mesh>
-    </>
+
+      {/* Everything attached to Earth */}
+      {children}
+    </group>
   );
 }
 

@@ -41,6 +41,18 @@ function Ship({
     const z = start[2] + (end[2] - start[2]) * progress.current;
 
     shipRef.current.position.set(x, y, z);
+
+    const dx = end[0] - start[0];
+const dy = end[1] - start[1];
+const dz = end[2] - start[2];
+
+shipRef.current.lookAt(
+  x + dx,
+  y + dy,
+  z + dz
+);
+
+shipRef.current.rotateX(Math.PI / 2);
   });
 
   if (!start || !end) return null;
