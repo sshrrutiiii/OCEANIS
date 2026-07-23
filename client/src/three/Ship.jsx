@@ -15,6 +15,7 @@ function Ship({
   const lastSent = useRef(0);
 
   const routePoints = useMemo(() => {
+    if (!start || !end) return [];
     return generateRoutePoints(start, end, 120);
   }, [start, end]);
 
@@ -23,12 +24,14 @@ function Ship({
     if (!playing) return;
     if (routePoints.length === 0) return;
 
+    // Move ship
     progress.current += 0.0015 * speed;
 
     if (progress.current > 1) {
       progress.current = 1;
     }
 
+    // Update progress every 1%
     if (
       onProgress &&
       Math.abs(progress.current - lastSent.current) >= 0.01
@@ -57,6 +60,8 @@ function Ship({
       next[2]
     );
 
+    // Keep ship pointing forward
+    shipRef.current.rotation.z = 0;
     shipRef.current.rotateX(Math.PI / 2);
   });
 

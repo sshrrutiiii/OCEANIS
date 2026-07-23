@@ -29,26 +29,46 @@ function RouteForm({ setRouteData }) {
       return;
     }
 
-    const sourcePort = ports.find((port) => port.name === source);
+    const sourcePort = ports.find(
+      (port) => port.name === source
+    );
+
     const destinationPort = ports.find(
       (port) => port.name === destination
     );
 
-    const distance = calculateDistance(sourcePort, destinationPort);
+    const distance = calculateDistance(
+      sourcePort,
+      destinationPort
+    );
 
-    const eta = (distance / (speed * 1.852)).toFixed(1);
+    const eta = Number(
+      (distance / (speed * 1.852)).toFixed(1)
+    );
 
-    const fuel = (distance * 0.08).toFixed(0);
+    const fuel = Number(
+      (distance * 0.08).toFixed(0)
+    );
 
     const route = {
       source,
       destination,
+
       sourcePort,
       destinationPort,
+
       speed,
+
+      // Raw values (for AI & calculations)
+      distanceKm: distance,
+      etaHours: eta,
+      fuelTons: fuel,
+
+      // Display values
       distance: `${distance} km`,
       eta: `${eta} Hours`,
       fuel: `${fuel} Tons`,
+
       route: generateRoute(source, destination),
     };
 
@@ -88,7 +108,10 @@ function RouteForm({ setRouteData }) {
           <option value="">Select Source Port</option>
 
           {ports.map((port) => (
-            <option key={port.id} value={port.name}>
+            <option
+              key={port.id}
+              value={port.name}
+            >
               {port.name} ({port.country})
             </option>
           ))}
@@ -111,7 +134,10 @@ function RouteForm({ setRouteData }) {
           <option value="">Select Destination Port</option>
 
           {ports.map((port) => (
-            <option key={port.id} value={port.name}>
+            <option
+              key={port.id}
+              value={port.name}
+            >
               {port.name} ({port.country})
             </option>
           ))}
@@ -137,7 +163,9 @@ function RouteForm({ setRouteData }) {
           min="10"
           max="40"
           value={speed}
-          onChange={(e) => setSpeed(Number(e.target.value))}
+          onChange={(e) =>
+            setSpeed(Number(e.target.value))
+          }
           className="w-full accent-cyan-400 cursor-pointer"
         />
       </div>
