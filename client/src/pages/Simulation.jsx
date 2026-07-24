@@ -5,18 +5,20 @@ import SimulationControls from "../components/SimulationControls";
 function Simulation() {
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
+
+  // Ship progress
   const [progress, setProgress] = useState(0);
 
-  // Reset ke liye
-  const [resetKey, setResetKey] = useState(0);
+  // Force Ship remount on restart
+  const [simulationKey, setSimulationKey] = useState(0);
 
   const resetSimulation = () => {
     setPlaying(false);
     setSpeed(1);
     setProgress(0);
 
-    // EarthSimulation ko dobara mount karega
-    setResetKey((prev) => prev + 1);
+    // Remount EarthSimulation
+    setSimulationKey((prev) => prev + 1);
   };
 
   const routeData = useMemo(() => {
@@ -31,21 +33,26 @@ function Simulation() {
     );
   }
 
-  const covered = (routeData.distanceKm * progress).toFixed(0);
+  const covered = (
+    routeData.distanceKm * progress
+  ).toFixed(0);
+
   const remaining = (
     routeData.distanceKm -
     routeData.distanceKm * progress
   ).toFixed(0);
 
-  const fuelUsed = (routeData.fuelTons * progress).toFixed(1);
+  const fuelUsed = (
+    routeData.fuelTons * progress
+  ).toFixed(1);
 
   const etaRemaining = (
-    routeData.etaHours *
-    (1 - progress)
+    routeData.etaHours * (1 - progress)
   ).toFixed(1);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white pt-28 px-8">
+
       <div className="max-w-7xl mx-auto">
 
         <h1 className="text-5xl font-bold text-center mb-12">
@@ -54,7 +61,7 @@ function Simulation() {
 
         <div className="grid lg:grid-cols-2 gap-8">
 
-          {/* Left Panel */}
+          {/* Left */}
 
           <div className="bg-slate-900 rounded-3xl p-8 border border-cyan-500/20">
 
@@ -116,6 +123,7 @@ function Simulation() {
                     ? "Sailing"
                     : "Paused"}
                 </span>
+
               </div>
 
             </div>
@@ -125,17 +133,19 @@ function Simulation() {
             <div className="mt-8">
 
               <div className="flex justify-between mb-2">
+
                 <span>Voyage Progress</span>
 
                 <span className="text-cyan-400">
                   {(progress * 100).toFixed(0)}%
                 </span>
+
               </div>
 
               <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
 
                 <div
-                  className="h-full bg-cyan-400 transition-all duration-300"
+                  className="h-full bg-cyan-400 transition-all"
                   style={{
                     width: `${progress * 100}%`,
                   }}
@@ -145,9 +155,9 @@ function Simulation() {
 
             </div>
 
-            {/* Live Statistics */}
+            {/* Stats */}
 
-            <div className="mt-8 grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mt-8">
 
               <div className="bg-slate-800 rounded-xl p-4">
                 <p className="text-slate-400 text-sm">
@@ -212,11 +222,12 @@ function Simulation() {
           <div className="bg-slate-900 rounded-3xl border border-cyan-500/20 overflow-hidden h-[650px]">
 
             <EarthSimulation
-              key={resetKey}
+              key={simulationKey}
               sourcePort={routeData.sourcePort}
               destinationPort={routeData.destinationPort}
               playing={playing}
               speed={speed}
+              progress={progress}
               onProgress={setProgress}
             />
 
@@ -225,6 +236,7 @@ function Simulation() {
         </div>
 
       </div>
+
     </div>
   );
 }
