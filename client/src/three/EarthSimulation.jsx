@@ -1,6 +1,6 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useEffect } from "react";
 
 import Globe from "./Globe";
 import Ship from "./Ship";
@@ -15,10 +15,10 @@ function EarthScene({
   destinationPort,
   playing,
   speed,
-  progress,
   onProgress,
 }) {
   const globeRef = useRef();
+  const targetRotation = useRef(0);
 
   const start = useMemo(() => {
     if (!sourcePort) return null;
@@ -30,18 +30,32 @@ function EarthScene({
     return latLngToVector3(destinationPort.lat, destinationPort.lng);
   }, [destinationPort]);
 
+  useEffect(() => {
+    if (!start || !end) return;
+
+    const centerX = (start[0] + end[0]) / 2;
+    const centerZ = (start[2] + end[2]) / 2;
+
+    targetRotation.current = Math.atan2(centerX, centerZ);
+  }, [start, end]);
+
   useFrame(() => {
     if (!globeRef.current) return;
 
-    // Idle rotation
-    if (!playing) {
+    if (!start || !end) {
       globeRef.current.rotation.y += 0.001;
+      return;
     }
+
+    const diff =
+      targetRotation.current -
+      globeRef.current.rotation.y;
+
+    globeRef.current.rotation.y += diff * 0.05;
   });
 
   return (
     <Globe globeRef={globeRef}>
-
       {start && (
         <PortMarker
           position={start}
@@ -69,12 +83,10 @@ function EarthScene({
           end={end}
           playing={playing}
           speed={speed}
-          progress={progress}
           onProgress={onProgress}
           globeRef={globeRef}
         />
       )}
-
     </Globe>
   );
 }
@@ -84,12 +96,10 @@ function EarthSimulation({
   destinationPort,
   playing,
   speed,
-  progress,
   onProgress,
 }) {
   return (
     <Canvas
-      shadows
       camera={{
         position: [0, 0, 3.2],
         fov: 45,
@@ -97,7 +107,7 @@ function EarthSimulation({
     >
       <SpaceStars />
 
-      <ambientLight intensity={0.65} />
+      <ambientLight intensity={0.7} />
 
       <directionalLight
         position={[5, 3, 5]}
@@ -105,7 +115,7 @@ function EarthSimulation({
       />
 
       <directionalLight
-        position={[-5, -3, -5]}
+        position={[-4, -2, -3]}
         intensity={1}
       />
 
@@ -119,13 +129,16 @@ function EarthSimulation({
         destinationPort={destinationPort}
         playing={playing}
         speed={speed}
-        progress={progress}
         onProgress={onProgress}
       />
 
       <OrbitControls
         enableZoom={false}
         enablePan={false}
+        enableDamping
+        dampingFactor={0.08}
+        rotateSpeed={0.8}
+        autoRotate={false}
       />
     </Canvas>
   );

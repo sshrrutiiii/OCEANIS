@@ -7,22 +7,23 @@ function Ship({
   end,
   playing,
   speed,
-  progress,
   onProgress,
   globeRef,
 }) {
   const shipRef = useRef();
 
-  const internalProgress = useRef(0);
+  const progress = useRef(0);
+  const lastSent = useRef(0);
 
   const routePoints = useMemo(() => {
     if (!start || !end) return [];
-    return generateRoutePoints(start, end, 180);
+    return generateRoutePoints(start, end, 120);
   }, [start, end]);
 
-  // Restart support
+  // Reset ship whenever route changes
   useEffect(() => {
-    internalProgress.current = progress || 0;
+    progress.current = 0;
+    lastSent.current = 0;
 
     if (shipRef.current && routePoints.length > 0) {
       const first = routePoints[0];
@@ -32,30 +33,50 @@ function Ship({
         first[1],
         first[2]
       );
+
+      if (routePoints.length > 1) {
+        const second = routePoints[1];
+
+        shipRef.current.lookAt(
+          second[0],
+          second[1],
+          second[2]
+        );
+
+        shipRef.current.rotation.z = 0;
+        shipRef.current.rotateX(Math.PI / 2);
+      }
     }
-  }, [progress, routePoints]);
+
+    if (onProgress) {
+      onProgress(0);
+    }
+  }, [start, end, routePoints, onProgress]);
 
   useFrame(() => {
     if (!shipRef.current) return;
-    if (routePoints.length < 2) return;
+    if (!playing) return;
+    if (routePoints.length === 0) return;
 
-    if (playing && internalProgress.current < 1) {
-      internalProgress.current += 0.0015 * speed;
+    // Stop at destination
+    if (progress.current >= 1) return;
 
-      if (internalProgress.current > 1) {
-        internalProgress.current = 1;
-      }
+    progress.current += 0.0015 * speed;
 
-      if (onProgress) {
-        onProgress(internalProgress.current);
-      }
+    if (progress.current > 1) {
+      progress.current = 1;
+    }
+
+    if (
+      onProgress &&
+      Math.abs(progress.current - lastSent.current) >= 0.01
+    ) {
+      lastSent.current = progress.current;
+      onProgress(progress.current);
     }
 
     const index = Math.min(
-      Math.floor(
-        internalProgress.current *
-          (routePoints.length - 1)
-      ),
+      Math.floor(progress.current * (routePoints.length - 1)),
       routePoints.length - 2
     );
 
@@ -74,16 +95,24 @@ function Ship({
       next[2]
     );
 
+    shipRef.current.rotation.z = 0;
     shipRef.current.rotateX(Math.PI / 2);
 
-    // Earth follows ship
+    // Rotate Earth smoothly to keep ship visible
     if (globeRef?.current) {
-      const angle =
-        -Math.atan2(current[0], current[2]);
+      const targetRotation = Math.atan2(
+        current[0],
+        current[2]
+      );
 
-      globeRef.current.rotation.y +=
-        (angle - globeRef.current.rotation.y) *
-        0.05;
+      let diff =
+        targetRotation -
+        globeRef.current.rotation.y;
+
+      if (diff > Math.PI) diff -= Math.PI * 2;
+      if (diff < -Math.PI) diff += Math.PI * 2;
+
+      globeRef.current.rotation.y += diff * 0.03;
     }
   });
 
@@ -91,11 +120,8 @@ function Ship({
 
   return (
     <group ref={shipRef}>
-      {/* Ship */}
-
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <coneGeometry args={[0.025, 0.09, 20]} />
-
         <meshStandardMaterial
           color="#06b6d4"
           emissive="#06b6d4"
@@ -103,11 +129,8 @@ function Ship({
         />
       </mesh>
 
-      {/* Glow */}
-
       <mesh>
         <sphereGeometry args={[0.015, 20, 20]} />
-
         <meshStandardMaterial
           color="#67e8f9"
           emissive="#67e8f9"

@@ -5,11 +5,9 @@ import SimulationControls from "../components/SimulationControls";
 function Simulation() {
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
-
-  // Ship progress
   const [progress, setProgress] = useState(0);
 
-  // Force Ship remount on restart
+  // NEW
   const [simulationKey, setSimulationKey] = useState(0);
 
   const resetSimulation = () => {
@@ -17,7 +15,7 @@ function Simulation() {
     setSpeed(1);
     setProgress(0);
 
-    // Remount EarthSimulation
+    // Force Earth + Ship reset
     setSimulationKey((prev) => prev + 1);
   };
 
@@ -33,13 +31,10 @@ function Simulation() {
     );
   }
 
-  const covered = (
-    routeData.distanceKm * progress
-  ).toFixed(0);
-
+  const covered = (routeData.distanceKm * progress).toFixed(0);
   const remaining = (
     routeData.distanceKm -
-    routeData.distanceKm * progress
+    covered
   ).toFixed(0);
 
   const fuelUsed = (
@@ -47,7 +42,8 @@ function Simulation() {
   ).toFixed(1);
 
   const etaRemaining = (
-    routeData.etaHours * (1 - progress)
+    routeData.etaHours *
+    (1 - progress)
   ).toFixed(1);
 
   return (
@@ -145,7 +141,7 @@ function Simulation() {
               <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
 
                 <div
-                  className="h-full bg-cyan-400 transition-all"
+                  className="h-full bg-cyan-400 transition-all duration-300"
                   style={{
                     width: `${progress * 100}%`,
                   }}
@@ -155,9 +151,9 @@ function Simulation() {
 
             </div>
 
-            {/* Stats */}
+            {/* Live Stats */}
 
-            <div className="grid grid-cols-2 gap-4 mt-8">
+            <div className="mt-8 grid grid-cols-2 gap-4">
 
               <div className="bg-slate-800 rounded-xl p-4">
                 <p className="text-slate-400 text-sm">
@@ -227,7 +223,6 @@ function Simulation() {
               destinationPort={routeData.destinationPort}
               playing={playing}
               speed={speed}
-              progress={progress}
               onProgress={setProgress}
             />
 

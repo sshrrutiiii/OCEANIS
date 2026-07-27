@@ -80,15 +80,18 @@ function RoutePlanner() {
 
         {/* Right */}
 
-        <div className="bg-slate-900 rounded-3xl border border-cyan-500/20 h-[620px] overflow-hidden">
+        <div className="sticky top-28">
 
-          <EarthRoute
-            sourcePort={routeData?.sourcePort}
-            destinationPort={routeData?.destinationPort}
-          />
+          <div className="bg-slate-900/70 backdrop-blur-xl border border-cyan-500/20 rounded-3xl overflow-hidden h-[620px]">
+
+            <EarthRoute
+              sourcePort={routeData?.sourcePort}
+              destinationPort={routeData?.destinationPort}
+            />
+
+          </div>
 
         </div>
-
       </div>
 
       {/* Route Summary */}
@@ -98,11 +101,11 @@ function RoutePlanner() {
         <div className="max-w-7xl mx-auto mt-12">
 
           <RouteInfo routeData={routeData} />
-          
-            <WeatherCard
-              source={routeData.sourcePort}
-              destination={routeData.destinationPort}
-            />
+
+          <WeatherCard
+            source={routeData.sourcePort}
+            destination={routeData.destinationPort}
+          />
 
         </div>
 
