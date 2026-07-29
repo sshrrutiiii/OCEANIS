@@ -11,26 +11,26 @@ function RotatingEarth() {
   useFrame(() => {
     if (!globeRef.current) return;
 
-    // Smooth rotation
     globeRef.current.rotation.y += 0.002;
   });
 
-  return (
-    <Globe globeRef={globeRef} />
-  );
+  return <Globe globeRef={globeRef} />;
 }
 
 function EarthHero() {
   return (
     <Canvas
+      style={{
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+      }}
       camera={{
         position: [0, 0, 3.2],
         fov: 45,
       }}
     >
       <SpaceStars />
-
-      {/* Lights */}
 
       <ambientLight intensity={0.7} />
 
@@ -49,16 +49,12 @@ function EarthHero() {
         intensity={1.2}
       />
 
-      {/* Earth */}
-
       <RotatingEarth />
-
-      {/* Controls */}
 
       <OrbitControls
         enableZoom={false}
         enablePan={false}
-        autoRotate={false}
+        enableRotate={false}
       />
     </Canvas>
   );

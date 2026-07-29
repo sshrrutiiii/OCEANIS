@@ -1,4 +1,10 @@
 import DashboardCard from "../components/DashboardCard";
+
+import MonthlyRoutesChart from "../components/charts/MonthlyRoutesChart";
+import ShipTypeChart from "../components/charts/ShipTypeChart";
+import PortTrafficChart from "../components/charts/PortTrafficChart";
+import FuelChart from "../components/charts/FuelChart";
+
 import {
   FaShip,
   FaCloudSun,
@@ -79,11 +85,9 @@ function Dashboard() {
 
         </div>
 
-        {/* Middle */}
+        {/* Live Routes + AI */}
 
         <div className="grid lg:grid-cols-2 gap-8 mt-10">
-
-          {/* Live Routes */}
 
           <div className="bg-slate-900 rounded-3xl border border-cyan-500/20 p-8">
 
@@ -114,8 +118,6 @@ function Dashboard() {
 
           </div>
 
-          {/* AI Alerts */}
-
           <div className="bg-slate-900 rounded-3xl border border-cyan-500/20 p-8">
 
             <h2 className="text-2xl font-bold mb-6">
@@ -142,6 +144,20 @@ function Dashboard() {
             </div>
 
           </div>
+
+        </div>
+
+        {/* Charts */}
+
+        <div className="grid lg:grid-cols-2 gap-8 mt-10">
+
+          <MonthlyRoutesChart />
+
+          <ShipTypeChart />
+
+          <PortTrafficChart />
+
+          <FuelChart />
 
         </div>
 

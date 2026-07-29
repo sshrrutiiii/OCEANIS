@@ -31,7 +31,14 @@ function EarthScene({
   }, [destinationPort]);
 
   useEffect(() => {
-    if (!start || !end) return;
+    if (globeRef.current) {
+      globeRef.current.rotation.y = 0;
+    }
+
+    if (!start || !end) {
+      targetRotation.current = 0;
+      return;
+    }
 
     const centerX = (start[0] + end[0]) / 2;
     const centerZ = (start[2] + end[2]) / 2;
@@ -47,11 +54,14 @@ function EarthScene({
       return;
     }
 
-    const diff =
-      targetRotation.current -
-      globeRef.current.rotation.y;
+    const current = globeRef.current.rotation.y;
 
-    globeRef.current.rotation.y += diff * 0.05;
+    let diff = targetRotation.current - current;
+
+    if (diff > Math.PI) diff -= Math.PI * 2;
+    if (diff < -Math.PI) diff += Math.PI * 2;
+
+    globeRef.current.rotation.y += diff * 0.03;
   });
 
   return (
@@ -84,7 +94,6 @@ function EarthScene({
           playing={playing}
           speed={speed}
           onProgress={onProgress}
-          globeRef={globeRef}
         />
       )}
     </Globe>

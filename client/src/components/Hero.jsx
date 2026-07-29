@@ -8,14 +8,14 @@ function Hero() {
     <section className="relative overflow-hidden bg-[#020617]">
 
       {/* Background Glow */}
-      <div className="absolute top-[-180px] left-[-150px] w-[450px] h-[450px] bg-cyan-500/20 blur-[170px] rounded-full"></div>
+      <div className="absolute top-[-180px] left-[-150px] w-[450px] h-[450px] bg-cyan-500/20 blur-[170px] rounded-full pointer-events-none"></div>
 
-      <div className="absolute bottom-[-150px] right-[-120px] w-[400px] h-[400px] bg-blue-700/20 blur-[170px] rounded-full"></div>
+      <div className="absolute bottom-[-150px] right-[-120px] w-[400px] h-[400px] bg-blue-700/20 blur-[170px] rounded-full pointer-events-none"></div>
 
       {/* Grid */}
-      <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:60px_60px]" />
+      <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-8 pt-24 pb-16 min-h-[calc(100vh-80px)] flex items-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-8 pt-24 pb-16 min-h-[calc(100vh-80px)] flex items-center">
 
         <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
 
@@ -28,7 +28,6 @@ function Hero() {
             </div>
 
             <h1 className="text-6xl lg:text-7xl font-extrabold leading-tight">
-
               Smarter{" "}
               <span className="text-cyan-400">
                 Ocean
@@ -37,7 +36,6 @@ function Hero() {
               <br />
 
               Navigation
-
             </h1>
 
             <p className="mt-8 text-slate-300 text-xl leading-10 max-w-xl">
@@ -48,20 +46,18 @@ function Hero() {
 
             <div className="flex gap-6 mt-12">
 
-              {/* Start Planning */}
-
               <button
+                type="button"
                 onClick={() => navigate("/route-planner")}
-                className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 px-10 py-5 rounded-2xl font-bold text-xl transition duration-300 hover:scale-105"
+                className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 px-10 py-5 rounded-2xl font-bold text-xl transition duration-300 hover:scale-105 cursor-pointer"
               >
                 Start Planning
               </button>
 
-              {/* Dashboard */}
-
               <button
+                type="button"
                 onClick={() => navigate("/dashboard")}
-                className="border border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-slate-900 px-10 py-5 rounded-2xl font-bold text-xl transition duration-300"
+                className="border border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-slate-900 px-10 py-5 rounded-2xl font-bold text-xl transition duration-300 cursor-pointer"
               >
                 View Dashboard
               </button>
@@ -74,9 +70,9 @@ function Hero() {
 
           <div className="relative flex justify-center items-center">
 
-            <div className="absolute w-[520px] h-[520px] rounded-full bg-cyan-400/20 blur-[120px]" />
+            <div className="absolute w-[520px] h-[520px] rounded-full bg-cyan-400/20 blur-[120px] pointer-events-none" />
 
-            <div className="relative w-[480px] h-[480px] lg:w-[560px] lg:h-[560px] mx-auto">
+            <div className="relative w-[480px] h-[480px] lg:w-[560px] lg:h-[560px] mx-auto pointer-events-none">
 
               <EarthHero />
 

@@ -8,7 +8,6 @@ function Ship({
   playing,
   speed,
   onProgress,
-  globeRef,
 }) {
   const shipRef = useRef();
 
@@ -20,7 +19,6 @@ function Ship({
     return generateRoutePoints(start, end, 120);
   }, [start, end]);
 
-  // Reset ship whenever route changes
   useEffect(() => {
     progress.current = 0;
     lastSent.current = 0;
@@ -51,14 +49,13 @@ function Ship({
     if (onProgress) {
       onProgress(0);
     }
-  }, [start, end, routePoints, onProgress]);
+  }, [routePoints, onProgress]);
 
   useFrame(() => {
     if (!shipRef.current) return;
     if (!playing) return;
     if (routePoints.length === 0) return;
 
-    // Stop at destination
     if (progress.current >= 1) return;
 
     progress.current += 0.0015 * speed;
@@ -97,29 +94,13 @@ function Ship({
 
     shipRef.current.rotation.z = 0;
     shipRef.current.rotateX(Math.PI / 2);
-
-    // Rotate Earth smoothly to keep ship visible
-    if (globeRef?.current) {
-      const targetRotation = Math.atan2(
-        current[0],
-        current[2]
-      );
-
-      let diff =
-        targetRotation -
-        globeRef.current.rotation.y;
-
-      if (diff > Math.PI) diff -= Math.PI * 2;
-      if (diff < -Math.PI) diff += Math.PI * 2;
-
-      globeRef.current.rotation.y += diff * 0.03;
-    }
   });
 
   if (!start || !end) return null;
 
   return (
     <group ref={shipRef}>
+      {/* Ship Body */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <coneGeometry args={[0.025, 0.09, 20]} />
         <meshStandardMaterial
@@ -129,6 +110,7 @@ function Ship({
         />
       </mesh>
 
+      {/* Glow */}
       <mesh>
         <sphereGeometry args={[0.015, 20, 20]} />
         <meshStandardMaterial
