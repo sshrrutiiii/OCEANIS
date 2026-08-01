@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   FaAnchor,
   FaMapMarkerAlt,
@@ -12,8 +11,7 @@ import { calculateDistance } from "../utils/distance";
 import { generateRoute } from "../utils/routes";
 
 function RouteForm({ setRouteData }) {
-  const navigate = useNavigate();
-
+ 
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
   const [speed, setSpeed] = useState(20);
@@ -79,7 +77,6 @@ function RouteForm({ setRouteData }) {
       JSON.stringify(route)
     );
 
-    navigate("/simulation");
   };
 
   return (

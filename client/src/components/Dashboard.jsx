@@ -4,6 +4,9 @@ import MonthlyRoutesChart from "../components/charts/MonthlyRoutesChart";
 import ShipTypeChart from "../components/charts/ShipTypeChart";
 import PortTrafficChart from "../components/charts/PortTrafficChart";
 import FuelChart from "../components/charts/FuelChart";
+import VoyageAnalytics from "../components/VoyageAnalytics";
+import VoyageHistory from "../components/VoyageHistory";
+import FleetStatus from "../components/FleetStatus";
 
 import {
   FaShip,
@@ -215,6 +218,9 @@ function Dashboard() {
           </div>
 
         </div>
+        <VoyageAnalytics />
+        <VoyageHistory />
+        <FleetStatus />
 
       </div>
 

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import RouteForm from "../components/RouteForm";
 import RouteInfo from "../components/RouteInfo";
 import EarthRoute from "../three/EarthRoute";
@@ -12,6 +14,8 @@ import {
 } from "react-icons/fa";
 
 function RoutePlanner() {
+  const navigate = useNavigate();
+
   const [routeData, setRouteData] = useState(null);
 
   return (
@@ -66,19 +70,15 @@ function RoutePlanner() {
 
       </div>
 
-      {/* Main Section */}
+      {/* Main */}
 
       <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8">
-
-        {/* Left */}
 
         <div className="bg-slate-900 rounded-3xl border border-cyan-500/20 p-8 h-fit">
 
           <RouteForm setRouteData={setRouteData} />
 
         </div>
-
-        {/* Right */}
 
         <div className="sticky top-28">
 
@@ -92,9 +92,10 @@ function RoutePlanner() {
           </div>
 
         </div>
+
       </div>
 
-      {/* Route Summary */}
+      {/* Route Result */}
 
       {routeData && (
 
@@ -106,6 +107,19 @@ function RoutePlanner() {
             source={routeData.sourcePort}
             destination={routeData.destinationPort}
           />
+
+          {/* Start Simulation */}
+
+          <div className="flex justify-center mt-10">
+
+            <button
+              onClick={() => navigate("/simulation")}
+              className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 px-10 py-5 rounded-2xl font-bold text-xl transition hover:scale-105"
+            >
+              Start Simulation →
+            </button>
+
+          </div>
 
         </div>
 
