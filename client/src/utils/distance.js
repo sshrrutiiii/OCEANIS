@@ -3,13 +3,13 @@ export function calculateDistance(port1, port2) {
 
   const toRad = (deg) => (deg * Math.PI) / 180;
 
-  const dLat = toRad(port2.lat - port1.lat);
-  const dLng = toRad(port2.lng - port1.lng);
+  const dLat = toRad(port2.latitude - port1.latitude);
+  const dLng = toRad(port2.longitude - port1.longitude);
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(port1.lat)) *
-      Math.cos(toRad(port2.lat)) *
+    Math.cos(toRad(port1.latitude)) *
+      Math.cos(toRad(port2.latitude)) *
       Math.sin(dLng / 2) *
       Math.sin(dLng / 2);
 

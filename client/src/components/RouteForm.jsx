@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaAnchor,
   FaMapMarkerAlt,
@@ -6,15 +7,30 @@ import {
   FaRoute,
 } from "react-icons/fa";
 
-import ports from "../data/ports";
+import { getAllPorts } from "../services/portService";
 import { calculateDistance } from "../utils/distance";
 import { generateRoute } from "../utils/routes";
 
 function RouteForm({ setRouteData }) {
- 
+
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
   const [speed, setSpeed] = useState(20);
+
+  const [ports, setPorts] = useState([]);
+
+  useEffect(() => {
+    async function loadPorts() {
+      try {
+        const data = await getAllPorts();
+        setPorts(data);
+      } catch (error) {
+        console.error("Failed to load ports:", error);
+      }
+    }
+
+    loadPorts();
+  }, []);
 
   const handleCalculate = () => {
     if (!source || !destination) {

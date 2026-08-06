@@ -16,8 +16,9 @@ function WeatherCard({ source, destination }) {
 
       try {
         const [src, dest] = await Promise.all([
-          getWeather(source.lat, source.lng),
-          getWeather(destination.lat, destination.lng),
+          getWeather(source.latitude, source.longitude),
+
+          getWeather(destination.latitude, destination.longitude),
         ]);
 
         setSourceWeather(src);

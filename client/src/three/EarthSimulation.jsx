@@ -22,12 +22,18 @@ function EarthScene({
 
   const start = useMemo(() => {
     if (!sourcePort) return null;
-    return latLngToVector3(sourcePort.lat, sourcePort.lng);
+    return latLngToVector3(
+      sourcePort.latitude,
+      sourcePort.longitude
+    );
   }, [sourcePort]);
 
   const end = useMemo(() => {
     if (!destinationPort) return null;
-    return latLngToVector3(destinationPort.lat, destinationPort.lng);
+    return latLngToVector3(
+      destinationPort.latitude,
+      destinationPort.longitude
+    );
   }, [destinationPort]);
 
   useEffect(() => {
