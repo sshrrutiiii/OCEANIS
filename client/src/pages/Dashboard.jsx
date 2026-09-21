@@ -1,4 +1,7 @@
 import DashboardCard from "../components/DashboardCard";
+import VoyageAnalytics from "../components/VoyageAnalytics";
+import VoyageHistory from "../components/VoyageHistory";
+import MonthlyRoutesChart from "../components/charts/MonthlyRoutesChart";
 
 function Dashboard() {
   const routes = [
@@ -22,11 +25,13 @@ function Dashboard() {
 
       <div className="max-w-7xl mx-auto">
 
+        {/* Page Title */}
         <h1 className="text-5xl font-bold mb-12 text-center">
           Maritime Dashboard
         </h1>
 
-        {/* Statistics */}
+        {/* ================= STATISTICS ================= */}
+
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
 
           <DashboardCard
@@ -55,10 +60,11 @@ function Dashboard() {
 
         </div>
 
-        {/* Bottom Section */}
+        {/* ================= TOP ROUTES + ACTIVITY ================= */}
+
         <div className="grid lg:grid-cols-2 gap-8 mt-10">
 
-          {/* Top Routes */}
+          {/* Top Shipping Routes */}
           <div className="bg-slate-900 border border-cyan-500/20 rounded-2xl p-8">
 
             <h2 className="text-2xl font-bold text-cyan-400 mb-6">
@@ -104,11 +110,24 @@ function Dashboard() {
 
         </div>
 
+        {/* ================= VOYAGE ANALYTICS ================= */}
+
+        <VoyageAnalytics />
+
+        {/* ================= MONTHLY ROUTES CHART ================= */}
+
+        <div className="mt-10">
+          <MonthlyRoutesChart />
+        </div>
+
+        {/* ================= VOYAGE HISTORY ================= */}
+
+        <VoyageHistory />
+
       </div>
 
     </div>
   );
 }
-
 
 export default Dashboard;
