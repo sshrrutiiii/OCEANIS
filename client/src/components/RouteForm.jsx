@@ -18,10 +18,14 @@ function RouteForm({ setRouteData }) {
 
   const [ports, setPorts] = useState([]);
 
+  // Load ports from backend
   useEffect(() => {
     async function loadPorts() {
       try {
         const data = await getAllPorts();
+
+        console.log("Ports loaded:", data);
+
         setPorts(data);
       } catch (error) {
         console.error("Failed to load ports:", error);
@@ -32,6 +36,10 @@ function RouteForm({ setRouteData }) {
   }, []);
 
   const handleCalculate = async () => {
+    // -----------------------------
+    // Validation
+    // -----------------------------
+
     if (!source || !destination) {
       alert("Please select both ports.");
       return;
@@ -41,6 +49,10 @@ function RouteForm({ setRouteData }) {
       alert("Source and Destination cannot be the same.");
       return;
     }
+
+    // -----------------------------
+    // Find selected ports
+    // -----------------------------
 
     const sourcePort = ports.find(
       (port) => port.name === source
@@ -55,47 +67,83 @@ function RouteForm({ setRouteData }) {
       return;
     }
 
+    // -----------------------------
     // Calculate distance
+    // -----------------------------
+
     const distance = calculateDistance(
       sourcePort,
       destinationPort
     );
 
+    // -----------------------------
     // Calculate ETA
+    // -----------------------------
+
     const eta = Number(
       (distance / (speed * 1.852)).toFixed(1)
     );
 
+    // -----------------------------
     // Calculate fuel
+    // -----------------------------
+
     const fuel = Number(
       (distance * 0.08).toFixed(0)
     );
 
-    // Create route data
+    // -----------------------------
+    // Generate route
+    // -----------------------------
+
+    const generatedRoute = generateRoute(
+      source,
+      destination
+    );
+
+    console.log("Generated route:", generatedRoute);
+
+    // -----------------------------
+    // Route data
+    // -----------------------------
+
     const route = {
+      // Basic information
       source,
       destination,
 
+      // Port objects
       sourcePort,
       destinationPort,
 
+      // Ship speed
       speed,
 
+      // Raw calculation values
       distanceKm: distance,
       etaHours: eta,
       fuelTons: fuel,
 
+      // Display values
       distance: `${distance} km`,
       eta: `${eta} Hours`,
       fuel: `${fuel} Tons`,
 
-      route: generateRoute(
-        source,
-        destination
-      ),
+      // Route path
+      //
+      // Keep BOTH properties.
+      // Some existing components use "route"
+      // while newer components can use "path".
+      path: generatedRoute,
+      route: generatedRoute,
     };
 
+    console.log("Final Route Data:", route);
+
+    // -----------------------------
     // Save voyage to backend
+    // -----------------------------
+
     try {
       await saveVoyage({
         source: sourcePort.name,
@@ -112,37 +160,41 @@ function RouteForm({ setRouteData }) {
         error
       );
 
+      /*
+        Do NOT stop the route.
+
+        Even if saving the voyage fails,
+        the route can still be displayed.
+      */
+
       alert(
         "Route calculated, but voyage could not be saved."
       );
     }
 
+    // -----------------------------
     // Send route data to RoutePlanner
+    // -----------------------------
+
     setRouteData(route);
 
+    // -----------------------------
     // Save route locally
+    // -----------------------------
+
     localStorage.setItem(
       "routeData",
       JSON.stringify(route)
     );
 
-    /*
-      IMPORTANT:
-      Do NOT navigate to /simulation here.
-
-      RoutePlanner will now show:
-      - Route information
-      - Weather
-      - Fuel prediction
-      - Route map
-      - Start Simulation button
-    */
+    console.log("Route data stored successfully.");
   };
 
   return (
     <div className="bg-slate-900 border border-cyan-500/20 rounded-3xl p-8">
 
       {/* Header */}
+
       <div className="flex items-center gap-3 mb-8">
 
         <FaRoute className="text-cyan-400 text-2xl" />
@@ -153,7 +205,8 @@ function RouteForm({ setRouteData }) {
 
       </div>
 
-      {/* Source */}
+      {/* Source Port */}
+
       <div className="mb-6">
 
         <label className="flex items-center gap-2 text-slate-300 mb-2">
@@ -166,7 +219,9 @@ function RouteForm({ setRouteData }) {
 
         <select
           value={source}
-          onChange={(e) => setSource(e.target.value)}
+          onChange={(e) =>
+            setSource(e.target.value)
+          }
           className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-400"
         >
 
@@ -175,19 +230,22 @@ function RouteForm({ setRouteData }) {
           </option>
 
           {ports.map((port) => (
+
             <option
               key={port.id}
               value={port.name}
             >
               {port.name}, {port.country}
             </option>
+
           ))}
 
         </select>
 
       </div>
 
-      {/* Destination */}
+      {/* Destination Port */}
+
       <div className="mb-6">
 
         <label className="flex items-center gap-2 text-slate-300 mb-2">
@@ -211,12 +269,14 @@ function RouteForm({ setRouteData }) {
           </option>
 
           {ports.map((port) => (
+
             <option
               key={port.id}
               value={port.name}
             >
               {port.name}, {port.country}
             </option>
+
           ))}
 
         </select>
@@ -224,6 +284,7 @@ function RouteForm({ setRouteData }) {
       </div>
 
       {/* Ship Speed */}
+
       <div className="mb-8">
 
         <label className="flex items-center gap-2 text-slate-300 mb-2">
@@ -237,6 +298,7 @@ function RouteForm({ setRouteData }) {
         <input
           type="number"
           min="1"
+          max="100"
           value={speed}
           onChange={(e) =>
             setSpeed(Number(e.target.value))
@@ -246,7 +308,8 @@ function RouteForm({ setRouteData }) {
 
       </div>
 
-      {/* Calculate Button */}
+      {/* Calculate Route Button */}
+
       <button
         onClick={handleCalculate}
         className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-4 rounded-xl transition flex items-center justify-center gap-3"
