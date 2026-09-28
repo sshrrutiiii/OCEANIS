@@ -30,7 +30,10 @@ public class RouteAlgorithmService {
         List<ShippingRoute> routes =
                 shippingRouteRepository.findAll();
 
+        // -----------------------------------------
         // Create graph
+        // -----------------------------------------
+
         Map<Long, List<ShippingRoute>> graph =
                 new HashMap<>();
 
@@ -44,15 +47,24 @@ public class RouteAlgorithmService {
                     .add(route);
         }
 
+        // -----------------------------------------
         // Distance from source
+        // -----------------------------------------
+
         Map<Long, Double> distances =
                 new HashMap<>();
 
+        // -----------------------------------------
         // Previous port
+        // -----------------------------------------
+
         Map<Long, Long> previous =
                 new HashMap<>();
 
+        // -----------------------------------------
         // Initialize distances
+        // -----------------------------------------
+
         for (ShippingRoute route : routes) {
 
             distances.put(
@@ -68,7 +80,10 @@ public class RouteAlgorithmService {
 
         distances.put(sourceId, 0.0);
 
+        // -----------------------------------------
         // Priority Queue
+        // -----------------------------------------
+
         PriorityQueue<Node> queue =
                 new PriorityQueue<>(
                         Comparator.comparingDouble(
@@ -77,13 +92,20 @@ public class RouteAlgorithmService {
                 );
 
         queue.add(
-                new Node(sourceId, 0.0)
+                new Node(
+                        sourceId,
+                        0.0
+                )
         );
 
-        // Dijkstra
+        // -----------------------------------------
+        // Dijkstra Algorithm
+        // -----------------------------------------
+
         while (!queue.isEmpty()) {
 
-            Node current = queue.poll();
+            Node current =
+                    queue.poll();
 
             Long currentPort =
                     current.portId;
@@ -139,7 +161,10 @@ public class RouteAlgorithmService {
             }
         }
 
+        // -----------------------------------------
         // No route found
+        // -----------------------------------------
+
         if (!sourceId.equals(destinationId)
                 && !previous.containsKey(destinationId)) {
 
@@ -151,7 +176,10 @@ public class RouteAlgorithmService {
             );
         }
 
-        // Reconstruct path
+        // -----------------------------------------
+        // Reconstruct shortest path
+        // -----------------------------------------
+
         List<Long> portIds =
                 new ArrayList<>();
 
@@ -166,32 +194,63 @@ public class RouteAlgorithmService {
                 break;
             }
 
-            current = previous.get(current);
+            current =
+                    previous.get(current);
         }
 
         Collections.reverse(portIds);
 
-        // Convert IDs to port names
-        List<String> portNames =
+        // -----------------------------------------
+        // Convert IDs to PortPoint objects
+        // -----------------------------------------
+
+        List<RouteResponse.PortPoint> path =
                 new ArrayList<>();
 
         for (Long portId : portIds) {
 
-            portNames.add(
-                    getPortName(portId)
+            Port port =
+                    portRepository
+                            .findById(portId)
+                            .orElseThrow(
+                                    () -> new RuntimeException(
+                                            "Port not found: "
+                                                    + portId
+                                    )
+                            );
+
+            path.add(
+                    new RouteResponse.PortPoint(
+                            port.getId(),
+                            port.getName(),
+                            port.getLatitude(),
+                            port.getLongitude()
+                    )
             );
         }
+
+        // -----------------------------------------
+        // Total shortest distance
+        // -----------------------------------------
 
         double totalDistance =
                 distances.get(destinationId);
 
+        // -----------------------------------------
+        // Final response
+        // -----------------------------------------
+
         return new RouteResponse(
                 getPortName(sourceId),
                 getPortName(destinationId),
-                portNames,
+                path,
                 totalDistance
         );
     }
+
+    // -----------------------------------------
+    // Get port name
+    // -----------------------------------------
 
     private String getPortName(Long portId) {
 
@@ -200,12 +259,17 @@ public class RouteAlgorithmService {
                         .findById(portId)
                         .orElseThrow(
                                 () -> new RuntimeException(
-                                        "Port not found: " + portId
+                                        "Port not found: "
+                                                + portId
                                 )
                         );
 
         return port.getName();
     }
+
+    // -----------------------------------------
+    // Dijkstra Node
+    // -----------------------------------------
 
     private static class Node {
 
