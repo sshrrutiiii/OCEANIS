@@ -1,3 +1,4 @@
+
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useMemo, useRef, useEffect } from "react";
@@ -13,6 +14,7 @@ import { latLngToVector3 } from "../utils/globe";
 function EarthScene({
   sourcePort,
   destinationPort,
+  routePath = [],
   playing,
   speed,
   onProgress,
@@ -20,21 +22,36 @@ function EarthScene({
   const globeRef = useRef();
   const targetRotation = useRef(0);
 
-  const start = useMemo(() => {
-    if (!sourcePort) return null;
-    return latLngToVector3(
-      sourcePort.latitude,
-      sourcePort.longitude
-    );
-  }, [sourcePort]);
+  // Use the actual shortest path from the backend.
+  const waypoints = useMemo(() => {
+    if (routePath.length > 0) {
+      return routePath.map((port) =>
+        latLngToVector3(
+          port.lat ?? port.latitude,
+          port.lng ?? port.longitude
+        )
+      );
+    }
 
-  const end = useMemo(() => {
-    if (!destinationPort) return null;
-    return latLngToVector3(
-      destinationPort.latitude,
-      destinationPort.longitude
-    );
-  }, [destinationPort]);
+    // Fallback to a direct route if no path is available.
+    if (sourcePort && destinationPort) {
+      return [
+        latLngToVector3(
+          sourcePort.latitude,
+          sourcePort.longitude
+        ),
+        latLngToVector3(
+          destinationPort.latitude,
+          destinationPort.longitude
+        ),
+      ];
+    }
+
+    return [];
+  }, [routePath, sourcePort, destinationPort]);
+
+  const start = waypoints[0] ?? null;
+  const end = waypoints[waypoints.length - 1] ?? null;
 
   useEffect(() => {
     if (globeRef.current) {
@@ -46,10 +63,10 @@ function EarthScene({
       return;
     }
 
-    const centerX = (start[0] + end[0]) / 2;
-    const centerZ = (start[2] + end[2]) / 2;
-
-    targetRotation.current = Math.atan2(centerX, centerZ);
+    targetRotation.current = Math.atan2(
+      (start[0] + end[0]) / 2,
+      (start[2] + end[2]) / 2
+    );
   }, [start, end]);
 
   useFrame(() => {
@@ -61,7 +78,6 @@ function EarthScene({
     }
 
     const current = globeRef.current.rotation.y;
-
     let diff = targetRotation.current - current;
 
     if (diff > Math.PI) diff -= Math.PI * 2;
@@ -72,31 +88,31 @@ function EarthScene({
 
   return (
     <Globe globeRef={globeRef}>
-      {start && (
+      {waypoints.map((position, index) => (
         <PortMarker
-          position={start}
-          color="#22d3ee"
+          key={`port-${index}`}
+          position={position}
+          color={
+            index === 0
+              ? "#22d3ee"
+              : index === waypoints.length - 1
+              ? "#ef4444"
+              : "#fbbf24"
+          }
         />
-      )}
+      ))}
 
-      {end && (
-        <PortMarker
-          position={end}
-          color="#ef4444"
-        />
-      )}
-
-      {start && end && (
+      {waypoints.slice(0, -1).map((point, index) => (
         <RouteLine
-          start={start}
-          end={end}
+          key={`segment-${index}`}
+          start={point}
+          end={waypoints[index + 1]}
         />
-      )}
+      ))}
 
-      {start && end && (
+      {waypoints.length >= 2 && (
         <Ship
-          start={start}
-          end={end}
+          waypoints={waypoints}
           playing={playing}
           speed={speed}
           onProgress={onProgress}
@@ -109,6 +125,7 @@ function EarthScene({
 function EarthSimulation({
   sourcePort,
   destinationPort,
+  routePath = [],
   playing,
   speed,
   onProgress,
@@ -142,6 +159,7 @@ function EarthSimulation({
       <EarthScene
         sourcePort={sourcePort}
         destinationPort={destinationPort}
+        routePath={routePath}
         playing={playing}
         speed={speed}
         onProgress={onProgress}

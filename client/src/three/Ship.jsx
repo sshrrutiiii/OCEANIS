@@ -1,23 +1,39 @@
+
 import { useFrame } from "@react-three/fiber";
 import { useRef, useMemo, useEffect } from "react";
 import { generateRoutePoints } from "../utils/routeCurve";
 
 function Ship({
-  start,
-  end,
+  waypoints = [],
   playing,
   speed,
   onProgress,
 }) {
   const shipRef = useRef();
-
   const progress = useRef(0);
   const lastSent = useRef(0);
 
+  // Create a smooth curve for each leg and join the legs.
   const routePoints = useMemo(() => {
-    if (!start || !end) return [];
-    return generateRoutePoints(start, end, 120);
-  }, [start, end]);
+    if (waypoints.length < 2) return [];
+
+    const points = [];
+
+    for (let i = 0; i < waypoints.length - 1; i++) {
+      const segment = generateRoutePoints(
+        waypoints[i],
+        waypoints[i + 1],
+        120
+      );
+
+      // Avoid duplicating the joining point between segments.
+      points.push(
+        ...(i === 0 ? segment : segment.slice(1))
+      );
+    }
+
+    return points;
+  }, [waypoints]);
 
   useEffect(() => {
     progress.current = 0;
@@ -31,76 +47,59 @@ function Ship({
         first[1],
         first[2]
       );
-
-      if (routePoints.length > 1) {
-        const second = routePoints[1];
-
-        shipRef.current.lookAt(
-          second[0],
-          second[1],
-          second[2]
-        );
-
-        shipRef.current.rotation.z = 0;
-        shipRef.current.rotateX(Math.PI / 2);
-      }
     }
 
-    if (onProgress) {
-      onProgress(0);
-    }
+    onProgress?.(0);
   }, [routePoints, onProgress]);
 
-  useFrame(() => {
-    if (!shipRef.current) return;
-    if (!playing) return;
-    if (routePoints.length === 0) return;
-
+  useFrame((_, delta) => {
+    if (!shipRef.current || !playing) return;
+    if (routePoints.length < 2) return;
     if (progress.current >= 1) return;
 
-    progress.current += 0.0015 * speed;
-
-    if (progress.current > 1) {
-      progress.current = 1;
-    }
+    // Keep animation speed consistent across frame rates.
+    progress.current = Math.min(
+      1,
+      progress.current + delta * 0.09 * Math.max(0, speed)
+    );
 
     if (
       onProgress &&
-      Math.abs(progress.current - lastSent.current) >= 0.01
+      (
+        Math.abs(progress.current - lastSent.current) >= 0.01 ||
+        progress.current >= 1
+      )
     ) {
       lastSent.current = progress.current;
       onProgress(progress.current);
     }
 
+    const lastIndex = routePoints.length - 1;
+    const positionOnPath = progress.current * lastIndex;
+
     const index = Math.min(
-      Math.floor(progress.current * (routePoints.length - 1)),
-      routePoints.length - 2
+      Math.floor(positionOnPath),
+      lastIndex - 1
     );
 
+    const fraction = positionOnPath - index;
     const current = routePoints[index];
     const next = routePoints[index + 1];
 
-    shipRef.current.position.set(
-      current[0],
-      current[1],
-      current[2]
-    );
+    const x = current[0] + (next[0] - current[0]) * fraction;
+    const y = current[1] + (next[1] - current[1]) * fraction;
+    const z = current[2] + (next[2] - current[2]) * fraction;
 
-    shipRef.current.lookAt(
-      next[0],
-      next[1],
-      next[2]
-    );
-
+    shipRef.current.position.set(x, y, z);
+    shipRef.current.lookAt(next[0], next[1], next[2]);
     shipRef.current.rotation.z = 0;
     shipRef.current.rotateX(Math.PI / 2);
   });
 
-  if (!start || !end) return null;
+  if (routePoints.length < 2) return null;
 
   return (
     <group ref={shipRef}>
-      {/* Ship Body */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <coneGeometry args={[0.025, 0.09, 20]} />
         <meshStandardMaterial
@@ -110,7 +109,6 @@ function Ship({
         />
       </mesh>
 
-      {/* Glow */}
       <mesh>
         <sphereGeometry args={[0.015, 20, 20]} />
         <meshStandardMaterial

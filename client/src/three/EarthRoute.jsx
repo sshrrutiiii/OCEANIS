@@ -9,29 +9,48 @@ import RouteLine from "./RouteLine";
 
 import { latLngToVector3 } from "../utils/globe";
 
-function EarthScene({ sourcePort, destinationPort }) {
+function EarthScene({
+  sourcePort,
+  destinationPort,
+  routePath = [],
+}) {
   const globeRef = useRef();
   const targetRotation = useRef(0);
 
-  const start = useMemo(() => {
-    if (!sourcePort) return null;
-    return latLngToVector3(
-      sourcePort.latitude,
-      sourcePort.longitude
-    );
-  }, [sourcePort]);
+  // Convert backend route points into 3D globe coordinates.
+  const pathPoints = useMemo(() => {
+    if (routePath.length > 0) {
+      return routePath.map((port) =>
+        latLngToVector3(
+          port.lat ?? port.latitude,
+          port.lng ?? port.longitude
+        )
+      );
+    }
 
-  const end = useMemo(() => {
-    if (!destinationPort) return null;
-    return latLngToVector3(
-      destinationPort.latitude,
-      destinationPort.longitude
-    );
-  }, [destinationPort]);
+    // Fallback: show a direct route if no calculated path exists.
+    if (sourcePort && destinationPort) {
+      return [
+        latLngToVector3(
+          sourcePort.latitude,
+          sourcePort.longitude
+        ),
+        latLngToVector3(
+          destinationPort.latitude,
+          destinationPort.longitude
+        ),
+      ];
+    }
+
+    return [];
+  }, [routePath, sourcePort, destinationPort]);
+
+  const start = pathPoints[0] ?? null;
+  const end = pathPoints[pathPoints.length - 1] ?? null;
+
   useEffect(() => {
     if (!start || !end) return;
 
-    // Midpoint of selected route
     const center = [
       (start[0] + end[0]) / 2,
       (start[1] + end[1]) / 2,
@@ -47,17 +66,14 @@ function EarthScene({ sourcePort, destinationPort }) {
   useFrame(() => {
     if (!globeRef.current) return;
 
-    // Auto rotate when no ports selected
     if (!start || !end) {
       globeRef.current.rotation.y += 0.001;
       return;
     }
 
     const current = globeRef.current.rotation.y;
-
     let diff = targetRotation.current - current;
 
-    // Shortest rotation
     if (diff > Math.PI) diff -= Math.PI * 2;
     if (diff < -Math.PI) diff += Math.PI * 2;
 
@@ -66,6 +82,7 @@ function EarthScene({ sourcePort, destinationPort }) {
 
   return (
     <Globe globeRef={globeRef}>
+      {/* Source port */}
       {start && (
         <PortMarker
           position={start}
@@ -73,19 +90,31 @@ function EarthScene({ sourcePort, destinationPort }) {
         />
       )}
 
-      {end && (
+      {/* Destination port */}
+      {end && pathPoints.length > 1 && (
         <PortMarker
           position={end}
           color="#ef4444"
         />
       )}
 
-      {start && end && (
-        <RouteLine
-          start={start}
-          end={end}
+      {/* Intermediate ports */}
+      {pathPoints.slice(1, -1).map((position, index) => (
+        <PortMarker
+          key={`route-port-${index}`}
+          position={position}
+          color="#fbbf24"
         />
-      )}
+      ))}
+
+      {/* Draw each segment of the calculated shortest path */}
+      {pathPoints.slice(0, -1).map((point, index) => (
+        <RouteLine
+          key={`route-segment-${index}`}
+          start={point}
+          end={pathPoints[index + 1]}
+        />
+      ))}
     </Globe>
   );
 }
@@ -93,6 +122,7 @@ function EarthScene({ sourcePort, destinationPort }) {
 function EarthRoute({
   sourcePort,
   destinationPort,
+  routePath = [],
 }) {
   return (
     <Canvas
@@ -123,6 +153,7 @@ function EarthRoute({
       <EarthScene
         sourcePort={sourcePort}
         destinationPort={destinationPort}
+        routePath={routePath}
       />
 
       <OrbitControls

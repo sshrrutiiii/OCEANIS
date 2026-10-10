@@ -1,7 +1,7 @@
 import { useLoader } from "@react-three/fiber";
 import { TextureLoader, BackSide } from "three";
 
-import earthImg from "../assets/earth_2k.jpg";
+import earthImg from "../assets/earth.jpg";
 
 function Globe({
   globeRef,

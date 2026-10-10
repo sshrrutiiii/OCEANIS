@@ -218,13 +218,14 @@ function Simulation() {
           <div className="bg-slate-900 rounded-3xl border border-cyan-500/20 overflow-hidden h-[650px]">
 
             <EarthSimulation
-              key={simulationKey}
-              sourcePort={routeData.sourcePort}
-              destinationPort={routeData.destinationPort}
-              playing={playing}
-              speed={speed}
-              onProgress={setProgress}
-            />
+  key={simulationKey}
+  sourcePort={routeData.sourcePort}
+  destinationPort={routeData.destinationPort}
+  routePath={routeData.path ?? []}
+  playing={playing}
+  speed={speed}
+  onProgress={setProgress}
+/>
 
           </div>
 
@@ -237,3 +238,4 @@ function Simulation() {
 }
 
 export default Simulation;
+

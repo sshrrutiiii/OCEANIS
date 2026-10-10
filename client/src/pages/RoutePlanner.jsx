@@ -6,6 +6,7 @@ import RouteInfo from "../components/RouteInfo";
 import EarthRoute from "../three/EarthRoute";
 import WeatherCard from "../components/WeatherCard";
 
+
 import {
   FaRoute,
   FaShip,
@@ -85,9 +86,10 @@ function RoutePlanner() {
           <div className="bg-slate-900/70 backdrop-blur-xl border border-cyan-500/20 rounded-3xl overflow-hidden h-[620px]">
 
             <EarthRoute
-              sourcePort={routeData?.sourcePort}
-              destinationPort={routeData?.destinationPort}
-            />
+  sourcePort={routeData?.sourcePort}
+  destinationPort={routeData?.destinationPort}
+  routePath={routeData?.path ?? []}
+/>
 
           </div>
 
@@ -103,10 +105,14 @@ function RoutePlanner() {
 
           <RouteInfo routeData={routeData} />
 
-          <WeatherCard
-            source={routeData.sourcePort}
-            destination={routeData.destinationPort}
-          />
+          
+      <WeatherCard
+        source={routeData.sourcePort}
+        destination={routeData.destinationPort}
+        fuelTons={routeData.fuelTons ?? routeData.fuel}
+      />
+
+
 
           {/* Start Simulation */}
 

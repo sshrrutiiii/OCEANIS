@@ -1,114 +1,154 @@
-function FuelPrediction({
-  fuelTons,
-  sourceWeather,
-  destinationWeather,
-}) {
-  if (!sourceWeather || !destinationWeather) return null;
+import { useMemo } from "react";
 
-  let extraFuel = 0;
-  const reasons = [];
+function FuelPrediction({ fuelTons, sourceWeather, destinationWeather }) {
+const prediction = useMemo(() => {
+const baseFuel = Number(fuelTons);
 
-  const analyze = (weather) => {
-    const condition = weather.weather[0].main;
-    const wind = weather.wind.speed;
 
-    if (condition === "Rain") {
-      extraFuel += fuelTons * 0.05;
-      reasons.push("Rain");
-    }
+if (!Number.isFinite(baseFuel) || baseFuel < 0) {
+  return null;
+}
 
-    if (condition === "Thunderstorm") {
-      extraFuel += fuelTons * 0.12;
-      reasons.push("Thunderstorm");
-    }
+const weatherData = [sourceWeather, destinationWeather].filter(
+  (weather) =>
+    weather?.weather?.[0] &&
+    weather?.main &&
+    weather?.wind
+);
 
-    if (wind > 15) {
-      extraFuel += fuelTons * 0.08;
-      reasons.push("Strong Wind");
-    }
+if (weatherData.length === 0) return null;
 
-    if (weather.main.humidity > 90) {
-      extraFuel += fuelTons * 0.03;
-      reasons.push("High Humidity");
-    }
-  };
+let extraPercentage = 0;
+const reasons = [];
 
-  analyze(sourceWeather);
-  analyze(destinationWeather);
+const conditions = weatherData.map((weather) =>
+  String(weather.weather[0].main || "").toLowerCase()
+);
 
-  const totalFuel = fuelTons + extraFuel;
+if (conditions.includes("thunderstorm")) {
+  extraPercentage += 0.12;
+  reasons.push("Thunderstorm conditions");
+} else if (conditions.includes("rain")) {
+  extraPercentage += 0.05;
+  reasons.push("Rain conditions");
+}
 
-  return (
-    <div className="mt-6 bg-slate-800 border border-cyan-500/20 rounded-2xl p-6">
+const maxWind = Math.max(
+  ...weatherData.map((weather) => Number(weather.wind.speed) || 0)
+);
 
-      <h2 className="text-2xl font-bold text-cyan-400 mb-5">
-        AI Fuel Prediction
-      </h2>
+if (maxWind > 15) {
+  extraPercentage += 0.08;
+  reasons.push("Strong wind");
+}
 
-      <div className="space-y-4">
+const maxHumidity = Math.max(
+  ...weatherData.map(
+    (weather) => Number(weather.main.humidity) || 0
+  )
+);
 
-        <div className="flex justify-between">
-          <span>Base Fuel</span>
-          <span>{fuelTons.toFixed(1)} Tons</span>
-        </div>
+if (maxHumidity > 90) {
+  extraPercentage += 0.03;
+  reasons.push("High humidity");
+}
 
-        <div className="flex justify-between">
-          <span>Weather Impact</span>
+const extraFuel = baseFuel * extraPercentage;
 
-          <span className="text-yellow-400">
-            +{extraFuel.toFixed(1)} Tons
-          </span>
-        </div>
+return {
+  baseFuel,
+  extraFuel,
+  totalFuel: baseFuel + extraFuel,
+  reasons,
+};
 
-        <div className="flex justify-between font-bold text-lg">
 
-          <span>Total Estimated</span>
+}, [fuelTons, sourceWeather, destinationWeather]);
 
-          <span className="text-cyan-400">
-            {totalFuel.toFixed(1)} Tons
-          </span>
+if (!prediction) return null;
 
-        </div>
+const { baseFuel, extraFuel, totalFuel, reasons } = prediction;
 
-        <div className="flex justify-between">
+// Ensure values are valid numbers before rendering.
+if (
+!Number.isFinite(baseFuel) ||
+!Number.isFinite(extraFuel) ||
+!Number.isFinite(totalFuel)
+) {
+return null;
+}
 
-          <span>AI Confidence</span>
+return ( <div className="mt-6 rounded-2xl border border-cyan-500/20 bg-slate-800 p-6"> <h2 className="mb-2 text-2xl font-bold text-cyan-400">
+AI Fuel Prediction </h2>
 
-          <span className="text-green-400">
-            96%
-          </span>
 
-        </div>
+  <p className="mb-5 text-sm text-slate-400">
+    Estimated fuel consumption based on the selected ports' weather.
+  </p>
 
-      </div>
-
-      {reasons.length > 0 && (
-
-        <div className="mt-6">
-
-          <h3 className="font-semibold mb-2">
-            Factors Affecting Fuel
-          </h3>
-
-          <ul className="space-y-1">
-
-            {reasons.map((reason, index) => (
-              <li
-                key={index}
-                className="text-slate-300"
-              >
-                • {reason}
-              </li>
-            ))}
-
-          </ul>
-
-        </div>
-
-      )}
-
+  <div className="space-y-4">
+    <div className="flex justify-between gap-4">
+      <span className="text-slate-300">Base Fuel</span>
+      <span className="font-medium">
+        {baseFuel.toFixed(1)} Tons
+      </span>
     </div>
-  );
+
+    <div className="flex justify-between gap-4">
+      <span className="text-slate-300">
+        Estimated Weather Impact
+      </span>
+      <span className="font-medium text-yellow-400">
+        +{extraFuel.toFixed(1)} Tons
+      </span>
+    </div>
+
+    <div className="flex justify-between gap-4 border-t border-slate-700 pt-4 text-lg font-bold">
+      <span>Total Estimated Fuel</span>
+      <span className="text-cyan-400">
+        {totalFuel.toFixed(1)} Tons
+      </span>
+    </div>
+  </div>
+
+  <div className="mt-5 rounded-xl bg-slate-900/70 p-4">
+    <p className="text-sm text-slate-300">
+      Prediction Type:{" "}
+      <span className="text-cyan-400">
+        Rule-Based Estimate
+      </span>
+    </p>
+
+    <p className="mt-2 text-xs text-slate-500">
+      Weather impact percentages are illustrative assumptions,
+      not validated maritime fuel-consumption measurements.
+    </p>
+  </div>
+
+  {reasons.length > 0 ? (
+    <div className="mt-6">
+      <h3 className="mb-2 font-semibold">
+        Factors Affecting Fuel
+      </h3>
+
+      <ul className="space-y-2">
+        {reasons.map((reason) => (
+          <li key={reason} className="text-slate-300">
+            <span className="mr-2 text-yellow-400">•</span>
+            {reason}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : (
+    <p className="mt-5 text-sm text-green-400">
+      No additional fuel impact was estimated by the current rules.
+    </p>
+  )}
+</div>
+
+
+);
 }
 
 export default FuelPrediction;
