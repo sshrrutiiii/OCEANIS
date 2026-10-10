@@ -91,6 +91,16 @@ Open the local URL printed by Vite, usually:
 ```text
 http://localhost:5173
 ```
+## 📸 Project Screenshots
+
+### 🏠 Home Page
+![OCEANIS Home Page](screenshots/home.png)
+
+### 🧭 Route Planner
+![OCEANIS Route Planner](screenshots/route-planner.png)
+
+### 🚢 Ship Simulation
+![OCEANIS Ship Simulation](screenshots/simulation.png)
 
 ## 🗺️ How It Works
 
