@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080/api/voyages";
+const API_URL = "https://oceanis-1jdp.onrender.com/api/voyages";
 
 export async function saveVoyage(voyage) {
   const response = await fetch(API_URL, {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/routes";
+const API_URL = "https://oceanis-1jdp.onrender.com/api/routes";
 
 export const findShortestRoute = async (
   sourcePortId,

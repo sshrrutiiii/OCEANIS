@@ -11,7 +11,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/voyages")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
+
+@CrossOrigin(origins = {
+        "http://localhost:5173",
+        "https://oceanis-maritime.vercel.app"
+})
+
 public class VoyageController {
 
     private final VoyageService voyageService;

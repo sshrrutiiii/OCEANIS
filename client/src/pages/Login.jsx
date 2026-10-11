@@ -24,7 +24,7 @@ function Login() {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/users/login",
+        "https://oceanis-1jdp.onrender.com/api/users/login",
         user
       );
 

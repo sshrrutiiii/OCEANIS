@@ -6,7 +6,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/routes")
-@CrossOrigin(origins = "http://localhost:5173")
+
+@CrossOrigin(origins = {
+        "http://localhost:5173",
+        "https://oceanis-maritime.vercel.app"
+})
+
 public class RouteController {
 
     private final RouteAlgorithmService routeAlgorithmService;

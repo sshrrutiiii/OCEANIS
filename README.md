@@ -64,7 +64,10 @@ Open the `server` directory in your IDE, configure your MySQL connection, and ru
 The backend runs on:
 
 ```text
-http://localhost:8080
+http://localhost:8080 
+
+Production backend URL:
+https://oceanis-1jdp.onrender.com
 ```
 
 ### 3. Configure the frontend

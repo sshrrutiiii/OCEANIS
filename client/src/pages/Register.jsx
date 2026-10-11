@@ -25,7 +25,7 @@ function Register() {
 
     try {
       await axios.post(
-        "http://localhost:8080/api/users/register",
+        "https://oceanis-1jdp.onrender.com/api/users/register",
         user
       );
 

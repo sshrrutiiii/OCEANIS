@@ -8,7 +8,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/routes")
-@CrossOrigin(origins = "http://localhost:5173")
+
+@CrossOrigin(origins = {
+        "http://localhost:5173",
+        "https://oceanis-maritime.vercel.app"
+})
+
 public class ShippingRouteController {
 
     private final ShippingRouteService shippingRouteService;
