@@ -11,7 +11,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/ports")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {
+        "http://localhost:5173",
+        "https://oceanis-maritime.vercel.app"
+})
 public class PortController {
 
     private final PortService portService;

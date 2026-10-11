@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080/ports";
+const API_URL = "https://oceanis-1jdp.onrender.com/api/ports";
 
 export async function getAllPorts() {
   try {
